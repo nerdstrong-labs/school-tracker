@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,0,0" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ─── Tokens ─────────────────────────────────────────────── */
+    :root {
+      --bg:          #0f0f0f;
+      --surface:     #1a1a1a;
+      --surface-2:   #222222;
+      --border:      #2a2a2a;
+      --border-2:    #333333;
+      --text:        #e8e8e8;
+      --text-2:      #888888;
+      --text-3:      #555555;
+      --accent:      #5b7fff;
+      --accent-dim:  rgba(91,127,255,0.12);
+      --danger:      #ef4444;
+      --warn:        #f59e0b;
+      --good:        #10b981;
+      --mono:        'IBM Plex Mono', monospace;
+      --sans:        'Inter', system-ui, sans-serif;
+      --radius:      6px;
+      --radius-lg:   10px;
+    }
+
+    /* ─── Reset & Base ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 4rem;
+    }
+
+    /* ─── Layout ─────────────────────────────────────────────── */
+    .app-header {
+      padding: 1.25rem 1.25rem 0;
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.25rem;
+    }
+    .app-header h1 {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-2);
+    }
+    .app-header .term-label {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text-3);
+    }
+
+    .main { max-width: 680px; margin: 0 auto; padding: 0 1.25rem; }
+
+    /* ─── Tabs ───────────────────────────────────────────────── */
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-2);
+      font-family: var(--sans);
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.85rem 1.1rem;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+      margin-bottom: -1px;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ─── Add Task Form ──────────────────────────────────────── */
+    .add-form {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .add-form-primary {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 0.5rem;
+      align-items: end;
+    }
+    .add-form-primary input[type="text"] {
+      width: 100%;
+    }
+    .form-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      flex: 1;
+      min-width: 100px;
+    }
+    .form-field label {
+      font-size: 0.72rem;
+      color: var(--text-2);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+    }
+    .form-expand-btn {
+      background: none;
+      border: none;
+      color: var(--text-3);
+      font-size: 0.8rem;
+      cursor: pointer;
+      padding: 0.5rem 0 0;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-family: var(--sans);
+    }
+    .form-expand-btn:hover { color: var(--text-2); }
+    .form-optional {
+      display: none;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+      margin-top: 0.75rem;
+    }
+    .form-optional.open { display: block; }
+
+    .fatigue-warning {
+      display: none;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: var(--radius);
+      padding: 0.6rem 0.75rem;
+      font-size: 0.82rem;
+      color: #fca5a5;
+      margin-top: 0.75rem;
+      line-height: 1.4;
+    }
+
+    /* ─── Inputs ─────────────────────────────────────────────── */
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select {
+      background: var(--surface-2);
+      border: 1px solid var(--border-2);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 0.88rem;
+      padding: 0.5rem 0.65rem;
+      width: 100%;
+      outline: none;
+      transition: border-color 0.15s;
+      -webkit-appearance: none;
+    }
+    input:focus, select:focus { border-color: var(--accent); }
+    input::placeholder { color: var(--text-3); }
+
+    /* ─── Buttons ────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-family: var(--sans);
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.5rem 0.9rem;
+      transition: opacity 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-ghost   { background: transparent; border: 1px solid var(--border-2); color: var(--text-2); }
+    .btn-ghost:hover { color: var(--text); border-color: var(--text-3); opacity: 1; }
+    .btn-danger  { background: var(--danger); color: #fff; }
+    .btn-warn    { background: var(--warn); color: #000; }
+    .btn-good    { background: var(--good); color: #fff; }
+    .btn-muted   { background: var(--surface-2); border: 1px solid var(--border-2); color: var(--text-2); }
+    .btn-sm { padding: 0.25rem 0.55rem; font-size: 0.78rem; }
+    .btn-icon { padding: 0.35rem; }
+
+    /* ─── Task Card ──────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--border-2);
+      border-radius: var(--radius-lg);
+      margin-bottom: 0.6rem;
+      cursor: pointer;
+      transition: border-color 0.15s;
+      overflow: hidden;
+    }
+    .card:hover { border-color: var(--border-2); }
+    .card.expanded { border-left-color: var(--accent); }
+
+    .card-collapsed {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      min-height: 56px;
+    }
+    .card-color-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .card-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+      flex: 1;
+      line-height: 1.3;
+    }
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+    .due-label {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text-2);
+    }
+    .urgency-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-3);
+      flex-shrink: 0;
+    }
+    .urgency-overdue .card-collapsed { background: rgba(239,68,68,0.04); }
+    .urgency-overdue .urgency-dot   { background: var(--danger); }
+    .urgency-today .urgency-dot     { background: var(--warn); }
+    .urgency-week .urgency-dot      { background: #eab308; }
+
+    .card-expanded {
+      display: none;
+      border-top: 1px solid var(--border);
+      padding: 0.85rem 1rem;
+    }
+    .card.expanded .card-expanded { display: block; }
+
+    .card-detail-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.72rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    .badge-type   { background: var(--surface-2); color: var(--text-2); border: 1px solid var(--border-2); }
+    .badge-recurring { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(91,127,255,0.25); }
+
+    .time-comparison {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 0.85rem;
+      padding: 0.65rem 0.75rem;
+      background: var(--surface-2);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+    .time-stat { flex: 1; }
+    .time-stat-label {
+      font-size: 0.68rem;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.2rem;
+    }
+    .time-stat-value {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .time-stat-value.running { color: var(--good); }
+
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    /* Subtasks */
+    .subtask-list { margin-top: 0.75rem; }
+    .subtask-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.3rem 0;
+      font-size: 0.85rem;
+      color: var(--text-2);
+    }
+    .subtask-item input[type="checkbox"] { cursor: pointer; flex-shrink: 0; accent-color: var(--accent); }
+    .subtask-done { text-decoration: line-through; color: var(--text-3); }
+    .subtask-add-row { display: flex; gap: 0.4rem; margin-top: 0.5rem; }
+    .subtask-add-row input { flex: 1; font-size: 0.82rem; padding: 0.3rem 0.5rem; }
+
+    .card-divider { border: none; border-top: 1px solid var(--border); margin: 0.75rem 0; }
+
+    /* ─── Class Group ────────────────────────────────────────── */
+    .class-group { margin-bottom: 1.75rem; }
+    .class-group-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .class-group-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .class-group-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-2);
+    }
+    .class-group-count {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text-3);
+      margin-left: auto;
+    }
+
+    /* ─── Classes Panel ──────────────────────────────────────── */
+    .classes-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .classes-section h3 {
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-2);
+      margin-bottom: 0.75rem;
+    }
+    .class-add-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+    }
+    .class-chips { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .class-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 0.25rem 0.6rem;
+      border-radius: 20px;
+      cursor: default;
+    }
+    .class-chip-remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      color: inherit;
+      opacity: 0.6;
+      font-size: 1rem;
+    }
+    .class-chip-remove:hover { opacity: 1; }
+
+    /* ─── History Panel ──────────────────────────────────────── */
+    .history-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      color: var(--text-2);
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      margin-bottom: 0.5rem;
+      transition: background 0.15s;
+    }
+    .history-toggle:hover { background: var(--surface); }
+    .history-panel {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .history-panel.open { display: block; }
+
+    .history-section-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-3);
+      margin-bottom: 0.75rem;
+      margin-top: 1rem;
+    }
+    .history-section-title:first-child { margin-top: 0; }
+
+    /* 7-day chart */
+    .chart-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 80px;
+      margin-bottom: 0.4rem;
+    }
+    .chart-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+    .bar-group {
+      display: flex;
+      gap: 2px;
+      align-items: flex-end;
+      width: 100%;
+      justify-content: center;
+    }
+    .bar {
+      width: 45%;
+      border-radius: 2px 2px 0 0;
+      min-height: 2px;
+      transition: height 0.3s;
+    }
+    .bar-est  { background: var(--accent); opacity: 0.4; }
+    .bar-act  { background: var(--good); }
+    .chart-day-label {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--text-3);
+      text-align: center;
+    }
+    .chart-legend {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.72rem;
+      color: var(--text-2);
+    }
+    .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+    /* Type breakdown table */
+    .type-table { width: 100%; border-collapse: collapse; }
+    .type-table th {
+      text-align: left;
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-3);
+      padding: 0.3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .type-table th:not(:first-child) { text-align: right; }
+    .type-table td {
+      font-size: 0.8rem;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-2);
+    }
+    .type-table td:not(:first-child) {
+      font-family: var(--mono);
+      text-align: right;
+      color: var(--text);
+    }
+    .type-table td.over { color: var(--danger); }
+    .type-table td.match { color: var(--good); }
+    .empty-state {
+      font-size: 0.82rem;
+      color: var(--text-3);
+      padding: 0.5rem 0;
+      font-style: italic;
+    }
+
+    /* ─── Archive ─────────────────────────────────────────────── */
+    .archive-toggle-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      color: var(--text-3);
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      padding: 0.65rem 1rem;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      margin-top: 1rem;
+    }
+    .archive-toggle-btn:hover { color: var(--text-2); border-color: var(--border-2); }
+    #archiveList { margin-top: 0.75rem; opacity: 0.6; }
+
+    /* ─── Footer ─────────────────────────────────────────────── */
+    .footer {
+      display: flex;
+      gap: 0.5rem;
+      padding: 1.25rem;
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+
+    /* ─── Modal ──────────────────────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border-2);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      max-width: 420px;
+      width: 100%;
+    }
+    .modal h3 { font-size: 1rem; margin-bottom: 0.4rem; }
+    .modal p  { font-size: 0.85rem; color: var(--text-2); margin-bottom: 1.25rem; line-height: 1.5; }
+    .modal-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; }
+    .modal-field { margin-bottom: 1rem; }
+    .modal-field label { display: block; font-size: 0.78rem; color: var(--text-2); margin-bottom: 0.3rem; }
+
+    /* ─── Misc ───────────────────────────────────────────────── */
+    .sortable-ghost { opacity: 0.3; }
+    .material-symbols-outlined { font-size: 15px; vertical-align: middle; }
+    .section-gap { margin-bottom: 1.5rem; }
+
+    /* ─── Mobile ─────────────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .add-form-primary { grid-template-columns: 1fr; }
+      .add-form-primary .btn { width: 100%; justify-content: center; }
+      .form-row { flex-direction: column; }
+      .form-field { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <h1>School Tracker</h1>
+    <span class="term-label" id="termLabel">—</span>
+  </header>
+
+  <div class="main">
+
+    <!-- ─── Classes ─────────────────────────────────────────── -->
+    <div class="classes-section section-gap" style="margin-top:1.25rem;">
+      <h3>Classes</h3>
+      <div class="class-add-row">
+        <div class="form-field" style="min-width:140px;">
+          <input id="className" type="text" placeholder="Class name">
+        </div>
+        <div class="form-field" style="max-width:130px;">
+          <input id="classFatigue" type="number" placeholder="Fatigue limit (min)">
+        </div>
+        <input type="color" id="classColor" value="#5b7fff"
+               style="padding:0; width:38px; height:36px; border:1px solid var(--border-2); border-radius:var(--radius); cursor:pointer; background:none;">
+        <button class="btn btn-muted btn-sm" onclick="addClass()" style="align-self:flex-end;">Add</button>
+      </div>
+      <div class="class-chips" id="classList"></div>
+    </div>
+
+    <!-- ─── Tab Bar ──────────────────────────────────────────── -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('due')">Due Soon</button>
+      <button class="tab-btn" onclick="switchTab('byclass')">By Class</button>
+      <button class="tab-btn" onclick="switchTab('history')">History</button>
+    </div>
+
+    <!-- ─── Tab: Due Soon ────────────────────────────────────── -->
+    <div class="tab-panel active" id="tab-due">
+
+      <!-- Add Task Form -->
+      <div class="add-form section-gap">
+        <div class="add-form-primary">
+          <input id="taskTitle" type="text" placeholder="Assignment title">
+          <input type="date" id="taskDate">
+          <button class="btn btn-primary" onclick="addTask()">Add</button>
+        </div>
+
+        <button class="form-expand-btn" onclick="toggleFormOptions()" id="formExpandBtn">
+          <span class="material-symbols-outlined">expand_more</span> More options
+        </button>
+
+        <div class="form-optional" id="formOptional">
+          <div class="form-row" style="margin-bottom:0.75rem;">
+            <div class="form-field">
+              <label>Class</label>
+              <select id="taskClass" onchange="checkFatigueWarning()">
+                <option value="">No class</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Type</label>
+              <select id="taskType">
+                <option value="">No type</option>
+                <option value="Quiz">Quiz</option>
+                <option value="Discussion">Discussion</option>
+                <option value="Lab">Lab</option>
+                <option value="Project">Project</option>
+                <option value="Exam">Exam</option>
+                <option value="Extra Credit">Extra Credit</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Est. time</label>
+              <select id="taskTime" onchange="checkFatigueWarning()">
+                <option value="">—</option>
+                <option value="15">15 min</option>
+                <option value="30">30 min</option>
+                <option value="60">1 hr</option>
+                <option value="90">1.5 hrs</option>
+                <option value="120">2 hrs</option>
+                <option value="180">3 hrs</option>
+                <option value="240">4 hrs</option>
+              </select>
+            </div>
+            <div class="form-field" style="min-width:80px; max-width:110px;">
+              <label>&nbsp;</label>
+              <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.85rem;color:var(--text-2);padding-top:0.4rem;">
+                <input type="checkbox" id="taskRecurring" style="accent-color:var(--accent)"> Weekly
+              </label>
+            </div>
+          </div>
+          <div class="fatigue-warning" id="fatigueWarning"></div>
+        </div>
+      </div>
+
+      <!-- Task List -->
+      <div id="taskList"></div>
+
+      <button class="archive-toggle-btn" onclick="toggleArchive()">
+        Show archived assignments
+      </button>
+      <div id="archiveList" style="display:none;"></div>
+
+    </div>
+
+    <!-- ─── Tab: By Class ────────────────────────────────────── -->
+    <div class="tab-panel" id="tab-byclass">
+      <div id="byClassList"></div>
+    </div>
+
+    <!-- ─── Tab: History ────────────────────────────────────── -->
+    <div class="tab-panel" id="tab-history">
+      <div style="margin-top:0.25rem;">
+        <div class="history-section-title">Last 7 Days — Estimated vs. Actual (minutes)</div>
+
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--accent);opacity:0.4;"></div> Estimated</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--good);"></div> Actual</div>
+        </div>
+
+        <div class="chart-bars" id="chartBars"></div>
+        <div id="chartLabels" style="display:flex;gap:6px;margin-bottom:1.5rem;"></div>
+
+        <div class="history-section-title">This Week — Estimated vs. Actual by Assignment Type</div>
+        <table class="type-table" id="typeTable">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Est.</th>
+              <th>Actual</th>
+              <th>Diff</th>
+            </tr>
+          </thead>
+          <tbody id="typeTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+
+  <!-- Footer -->
+  <div class="footer">
+    <button class="btn btn-good btn-sm" onclick="exportData()">Export backup</button>
+    <button class="btn btn-warn btn-sm" onclick="document.getElementById('importFile').click()">Import backup</button>
+    <input type="file" id="importFile" style="display:none;" accept=".json" onchange="importData(event)">
+  </div>
+
+  <!-- ─── Modals ───────────────────────────────────────────── -->
+
+  <!-- Manage Class -->
+  <div class="modal-overlay" id="manageClassModal">
+    <div class="modal">
+      <h3>Manage Class</h3>
+      <p>Archiving keeps your data hidden but safe. Deleting removes it entirely.</p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('manageClassModal')">Cancel</button>
+        <button class="btn btn-warn btn-sm" onclick="archiveClass()">Archive term</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDeleteClass()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Complete Task -->
+  <div class="modal-overlay" id="completionModal">
+    <div class="modal">
+      <h3>Mark complete</h3>
+      <p id="completionTaskTitle" style="color:var(--warn);margin-bottom:1rem;font-weight:500;"></p>
+      <div class="modal-field">
+        <label>Total time spent (minutes)</label>
+        <input type="number" id="completionTimeInput">
+      </div>
+      <div class="modal-field">
+        <label>Subtasks</label>
+        <div id="completionSubtasksList" style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem;"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('completionModal')">Cancel</button>
+        <button class="btn btn-good btn-sm" onclick="confirmCompletion()">Save & complete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Task -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <h3>Edit assignment</h3>
+      <div class="modal-field">
+        <label>Title</label>
+        <input type="text" id="editTaskTitle">
+      </div>
+      <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+        <div class="modal-field" style="flex:1;margin-bottom:0;">
+          <label>Due date</label>
+          <input type="date" id="editTaskDate">
+        </div>
+        <div class="modal-field" style="flex:1;margin-bottom:0;">
+          <label>Est. time</label>
+          <select id="editTaskTime">
+            <option value="">—</option>
+            <option value="15">15 min</option>
+            <option value="30">30 min</option>
+            <option value="60">1 hr</option>
+            <option value="90">1.5 hrs</option>
+            <option value="120">2 hrs</option>
+            <option value="180">3 hrs</option>
+            <option value="240">4 hrs</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-field">
+        <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.85rem;">
+          <input type="checkbox" id="editTaskRecurring" style="accent-color:var(--accent)"> Weekly recurring
+        </label>
+      </div>
+      <p style="font-size:0.78rem;color:var(--text-3);margin-bottom:1rem;">Class and type cannot be changed after creation.</p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('editModal')">Cancel</button>
+        <button class="btn btn-good btn-sm" onclick="saveEditTask()">Save changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ─── State ────────────────────────────────────────────────
+    let tasks   = JSON.parse(localStorage.getItem('schoolTrackerTasks'))   || [];
+    let classes = JSON.parse(localStorage.getItem('schoolTrackerClasses')) || [];
+    let expandedCardId   = null;
+    let classIdToManage  = null;
+    let taskToComplete   = null;
+    let taskToEdit       = null;
+    let showingArchive   = false;
+    let activeTab        = 'due';
+
+    const TYPE_ICONS = {
+      'Quiz': 'quiz', 'Discussion': 'forum', 'Lab': 'science',
+      'Project': 'design_services', 'Exam': 'history_edu', 'Extra Credit': 'stars'
+    };
+
+    // ─── Persistence ──────────────────────────────────────────
+    function saveData() {
+      localStorage.setItem('schoolTrackerTasks', JSON.stringify(tasks));
+      render();
+    }
+    function saveClasses() {
+      localStorage.setItem('schoolTrackerClasses', JSON.stringify(classes));
+      renderClasses();
+      populateClassDropdown();
+      render();
+    }
+
+    // ─── Render dispatcher ────────────────────────────────────
+    function render() {
+      renderTasks();
+      renderArchive();
+      renderByClass();
+      renderHistory();
+    }
+
+    // ─── Date helpers ─────────────────────────────────────────
+    function todayString() {
+      const t = new Date();
+      const offset = t.getTimezoneOffset();
+      return new Date(t.getTime() - offset * 60000).toISOString().split('T')[0];
+    }
+    function parseDate(s) {
+      const [y, m, d] = s.split('-');
+      return new Date(+y, m - 1, +d);
+    }
+    function diffDays(dateStr) {
+      const today = new Date(); today.setHours(0,0,0,0);
+      const d = parseDate(dateStr); d.setHours(0,0,0,0);
+      return Math.ceil((d - today) / 86400000);
+    }
+    function urgencyClass(dateStr) {
+      if (!dateStr) return '';
+      const d = diffDays(dateStr);
+      if (d < 0) return 'urgency-overdue';
+      if (d === 0) return 'urgency-today';
+      if (d <= 7) return 'urgency-week';
+      return '';
+    }
+    function friendlyDate(dateStr) {
+      if (!dateStr) return '—';
+      const d = diffDays(dateStr);
+      if (d < 0)  return `${Math.abs(d)}d overdue`;
+      if (d === 0) return 'Today';
+      if (d === 1) return 'Tomorrow';
+      if (d <= 6) return parseDate(dateStr).toLocaleDateString('en-US', { weekday: 'short' });
+      return parseDate(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function formatMins(totalSeconds) {
+      const m = Math.floor(totalSeconds / 60);
+      if (m < 60) return m + 'm';
+      const h = Math.floor(m / 60), rem = m % 60;
+      return rem > 0 ? `${h}h ${rem}m` : `${h}h`;
+    }
+    function formatMinsDirect(mins) {
+      if (!mins) return '—';
+      if (mins < 60) return mins + 'm';
+      const h = Math.floor(mins / 60), rem = mins % 60;
+      return rem > 0 ? `${h}h ${rem}m` : `${h}h`;
+    }
+
+    // ─── Tab switching ────────────────────────────────────────
+    function switchTab(name) {
+      activeTab = name;
+      document.querySelectorAll('.tab-btn').forEach((b, i) => {
+        b.classList.toggle('active', ['due','byclass','history'][i] === name);
+      });
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+      if (name === 'history') renderHistory();
+    }
+
+    // ─── Classes ──────────────────────────────────────────────
+    function renderClasses() {
+      const list = document.getElementById('classList');
+      list.innerHTML = '';
+      classes.filter(c => !c.archived).forEach(c => {
+        const span = document.createElement('span');
+        span.className = 'class-chip';
+        const limit = c.fatigueLimit ? ` · ${c.fatigueLimit}m` : '';
+        span.style.cssText = `background:${c.color}22;color:${c.color};border:1px solid ${c.color}55;`;
+        span.innerHTML = `${c.name}${limit}<button class="class-chip-remove" onclick="requestManageClass(${c.id})">&times;</button>`;
+        list.appendChild(span);
+      });
+    }
+
+    function populateClassDropdown() {
+      const sel = document.getElementById('taskClass');
+      const val = sel.value;
+      sel.innerHTML = '<option value="">No class</option>';
+      classes.filter(c => !c.archived).forEach(c => {
+        sel.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+      });
+      sel.value = val;
+    }
+
+    function addClass() {
+      const name = document.getElementById('className').value.trim();
+      if (!name) return;
+      const fatigueInput = document.getElementById('classFatigue').value;
+      const color = document.getElementById('classColor').value;
+      classes.push({ id: Date.now(), name, color, fatigueLimit: fatigueInput ? parseInt(fatigueInput) : 120, archived: false });
+      document.getElementById('className').value = '';
+      document.getElementById('classFatigue').value = '';
+      saveClasses();
+      updateTermLabel();
+    }
+
+    function requestManageClass(id) {
+      classIdToManage = id;
+      openModal('manageClassModal');
+    }
+    function archiveClass() {
+      const c = classes.find(x => x.id === classIdToManage);
+      if (c) c.archived = true;
+      tasks.forEach(t => { if (t.classId === classIdToManage) t.archived = true; });
+      saveClasses(); saveData(); closeModal('manageClassModal');
+    }
+    function confirmDeleteClass() {
+      classes = classes.filter(x => x.id !== classIdToManage);
+      tasks.forEach(t => { if (t.classId === classIdToManage) t.classId = null; });
+      saveClasses(); saveData(); closeModal('manageClassModal');
+    }
+
+    function updateTermLabel() {
+      const active = classes.filter(c => !c.archived);
+      document.getElementById('termLabel').textContent = active.length
+        ? active.map(c => c.name).join(' · ')
+        : '—';
+    }
+
+    // ─── Fatigue warning ─────────────────────────────────────
+    function checkFatigueWarning() {
+      const warn = document.getElementById('fatigueWarning');
+      const classId = parseInt(document.getElementById('taskClass').value);
+      const time = parseInt(document.getElementById('taskTime').value);
+      const date = document.getElementById('taskDate').value;
+
+      if (!classId || !time || !date) { warn.style.display = 'none'; return; }
+
+      const cls = classes.find(c => c.id === classId);
+      if (!cls) { warn.style.display = 'none'; return; }
+
+      const limit = cls.fatigueLimit || 120;
+      const existingMins = tasks
+        .filter(t => !t.archived && t.classId === classId && t.date === date)
+        .reduce((sum, t) => sum + (t.estimatedTime || 0), 0);
+
+      const total = existingMins + time;
+      if (total >= limit) {
+        const totalDisplay = formatMinsDirect(total);
+        const limitDisplay = formatMinsDirect(limit);
+        warn.innerHTML = `<strong>Fatigue risk:</strong> Adding this brings ${cls.name} to ${totalDisplay} on that day — above your ${limitDisplay} limit. Consider splitting across days.`;
+        warn.style.display = 'block';
+      } else {
+        warn.style.display = 'none';
+      }
+    }
+
+    // ─── Form options toggle ──────────────────────────────────
+    function toggleFormOptions() {
+      const opt = document.getElementById('formOptional');
+      const btn = document.getElementById('formExpandBtn');
+      const open = opt.classList.toggle('open');
+      btn.innerHTML = open
+        ? '<span class="material-symbols-outlined">expand_less</span> Fewer options'
+        : '<span class="material-symbols-outlined">expand_more</span> More options';
+    }
+
+    // ─── Add Task ─────────────────────────────────────────────
+    function addTask() {
+      const title = document.getElementById('taskTitle').value.trim();
+      const date  = document.getElementById('taskDate').value;
+      if (!title || !date) {
+        document.getElementById('taskTitle').style.borderColor = title ? '' : 'var(--danger)';
+        document.getElementById('taskDate').style.borderColor  = date  ? '' : 'var(--danger)';
+        setTimeout(() => {
+          document.getElementById('taskTitle').style.borderColor = '';
+          document.getElementById('taskDate').style.borderColor  = '';
+        }, 1500);
+        return;
+      }
+      const classId = document.getElementById('taskClass').value;
+      const type    = document.getElementById('taskType').value;
+      const time    = document.getElementById('taskTime').value;
+      const recur   = document.getElementById('taskRecurring').checked;
+
+      tasks.push({
+        id: Date.now(), title, date,
+        classId: classId ? parseInt(classId) : null,
+        type: type || null,
+        estimatedTime: time ? parseInt(time) : null,
+        timeSpent: 0,
+        isTimerRunning: false,
+        lastTimerStart: null,
+        recurring: recur,
+        archived: false,
+        subtasks: []
+      });
+      document.getElementById('taskTitle').value = '';
+      document.getElementById('taskDate').value  = '';
+      document.getElementById('taskType').value  = '';
+      document.getElementById('taskTime').value  = '';
+      document.getElementById('taskClass').value = '';
+      document.getElementById('taskRecurring').checked = false;
+      document.getElementById('fatigueWarning').style.display = 'none';
+      saveData();
+    }
+
+    // ─── Build Card ───────────────────────────────────────────
+    function buildCard(task, isArchive = false) {
+      const div = document.createElement('div');
+      div.className = `card ${isArchive ? '' : urgencyClass(task.date)}`;
+      div.dataset.id = task.id;
+
+      const cls = task.classId ? classes.find(c => c.id === task.classId) : null;
+      const dotColor = cls ? cls.color : 'var(--border-2)';
+
+      // Collapsed row
+      const collapsed = document.createElement('div');
+      collapsed.className = 'card-collapsed';
+      collapsed.innerHTML = `
+        <div class="card-color-dot" style="background:${dotColor};"></div>
+        <div class="card-title">${task.title}</div>
+        <div class="card-meta">
+          <span class="due-label">${isArchive ? task.date : friendlyDate(task.date)}</span>
+          ${!isArchive ? `<div class="urgency-dot"></div>` : ''}
+        </div>
+      `;
+      if (!isArchive) {
+        collapsed.onclick = () => toggleCard(task.id, div);
+      }
+      div.appendChild(collapsed);
+
+      // Expanded section
+      const expanded = document.createElement('div');
+      expanded.className = 'card-expanded';
+
+      // Badges row
+      let badgesHTML = '';
+      if (cls) badgesHTML += `<span class="badge" style="background:${cls.color}22;color:${cls.color};border:1px solid ${cls.color}44;">${cls.name}</span>`;
+      if (task.type) {
+        const icon = TYPE_ICONS[task.type] || 'task';
+        badgesHTML += `<span class="badge badge-type"><span class="material-symbols-outlined">${icon}</span>${task.type}</span>`;
+      }
+      if (task.recurring) badgesHTML += `<span class="badge badge-recurring">↺ Weekly</span>`;
+
+      // Time comparison block
+      const estMins = task.estimatedTime || null;
+      const spentSec = task.timeSpent || 0;
+      const timeBlockHTML = `
+        <div class="time-comparison">
+          <div class="time-stat">
+            <div class="time-stat-label">Estimated</div>
+            <div class="time-stat-value">${estMins ? formatMinsDirect(estMins) : '—'}</div>
+          </div>
+          <div class="time-stat">
+            <div class="time-stat-label">Actual</div>
+            <div class="time-stat-value ${task.isTimerRunning ? 'running' : ''}" id="timer-display-${task.id}">
+              ${spentSec > 0 || task.isTimerRunning ? formatMins(spentSec) : '—'}
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Subtasks
+      let subtasksHTML = task.subtasks.map(st => `
+        <div class="subtask-item">
+          <input type="checkbox" ${st.done ? 'checked' : ''} 
+            onchange="toggleSubtask(${task.id}, ${st.id})" ${isArchive ? 'disabled' : ''}>
+          <span class="${st.done ? 'subtask-done' : ''}">${st.text}</span>
+        </div>
+      `).join('');
+
+      const subtaskInput = isArchive ? '' : `
+        <div class="subtask-add-row">
+          <input id="subtask-input-${task.id}" placeholder="Add a step…" onkeydown="if(event.key==='Enter')addSubtask(${task.id})">
+          <button class="btn btn-muted btn-sm" onclick="addSubtask(${task.id})">+</button>
+        </div>
+      `;
+
+      // Actions
+      const timerIcon = task.isTimerRunning ? 'pause' : 'play_arrow';
+      const timerText = task.isTimerRunning ? 'Stop' : 'Start timer';
+      const timerClass = task.isTimerRunning ? 'btn-danger' : 'btn-ghost';
+      const actionsHTML = isArchive ? '' : `
+        <div class="card-actions">
+          <button class="btn ${timerClass} btn-sm" onclick="toggleTimer(${task.id})">
+            <span class="material-symbols-outlined">${timerIcon}</span>${timerText}
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="openEditModal(${task.id})">
+            <span class="material-symbols-outlined">edit</span>Edit
+          </button>
+          <button class="btn btn-good btn-sm" onclick="openCompletionModal(${task.id})">
+            <span class="material-symbols-outlined">check</span>Done
+          </button>
+        </div>
+      `;
+
+      expanded.innerHTML = `
+        <div class="card-detail-row">${badgesHTML}</div>
+        ${timeBlockHTML}
+        ${task.subtasks.length || !isArchive ? `<div class="subtask-list">${subtasksHTML}${subtaskInput}</div>` : ''}
+        ${actionsHTML ? `<hr class="card-divider">${actionsHTML}` : ''}
+      `;
+      div.appendChild(expanded);
+
+      return div;
+    }
+
+    // ─── Toggle Card ──────────────────────────────────────────
+    function toggleCard(taskId, el) {
+      // Collapse previously open card
+      if (expandedCardId && expandedCardId !== taskId) {
+        const prev = document.querySelector(`[data-id="${expandedCardId}"]`);
+        if (prev) prev.classList.remove('expanded');
+      }
+      const isOpen = el.classList.toggle('expanded');
+      expandedCardId = isOpen ? taskId : null;
+    }
+
+    // ─── Render Tasks ─────────────────────────────────────────
+    function renderTasks() {
+      const list = document.getElementById('taskList');
+      list.innerHTML = '';
+      const active = tasks
+        .filter(t => !t.archived)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+      active.forEach(t => list.appendChild(buildCard(t)));
+
+      // Re-expand previously open card
+      if (expandedCardId) {
+        const el = document.querySelector(`[data-id="${expandedCardId}"]`);
+        if (el) el.classList.add('expanded');
+      }
+    }
+
+    // ─── Archive ──────────────────────────────────────────────
+    function toggleArchive() {
+      showingArchive = !showingArchive;
+      document.getElementById('archiveList').style.display = showingArchive ? 'block' : 'none';
+    }
+    function renderArchive() {
+      const list = document.getElementById('archiveList');
+      list.innerHTML = '';
+      tasks.filter(t => t.archived)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .forEach(t => list.appendChild(buildCard(t, true)));
+    }
+
+    // ─── By Class ─────────────────────────────────────────────
+    function renderByClass() {
+      const list = document.getElementById('byClassList');
+      list.innerHTML = '';
+      const active = tasks.filter(t => !t.archived).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      const grouped = {};
+      active.forEach(t => {
+        const key = t.classId || '__none__';
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(t);
+      });
+
+      const orderedClasses = classes.filter(c => !c.archived);
+      if (grouped['__none__']) orderedClasses.push({ id: '__none__', name: 'Unassigned', color: 'var(--text-3)' });
+
+      orderedClasses.forEach(cls => {
+        const items = grouped[cls.id];
+        if (!items || items.length === 0) return;
+
+        const group = document.createElement('div');
+        group.className = 'class-group';
+        group.innerHTML = `
+          <div class="class-group-header">
+            <div class="class-group-dot" style="background:${cls.color};"></div>
+            <span class="class-group-name">${cls.name}</span>
+            <span class="class-group-count">${items.length} assignment${items.length !== 1 ? 's' : ''}</span>
+          </div>
+        `;
+        items.forEach(t => group.appendChild(buildCard(t)));
+        list.appendChild(group);
+      });
+
+      if (list.innerHTML === '') {
+        list.innerHTML = '<p class="empty-state">No active assignments. Add one in Due Soon.</p>';
+      }
+    }
+
+    // ─── History ──────────────────────────────────────────────
+    function renderHistory() {
+      // 7-day chart
+      const chartBars   = document.getElementById('chartBars');
+      const chartLabels = document.getElementById('chartLabels');
+      chartBars.innerHTML = '';
+      chartLabels.innerHTML = '';
+
+      const days = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const str = d.toISOString().split('T')[0];
+        days.push({ str, label: d.toLocaleDateString('en-US', { weekday: 'short' }).slice(0,2) });
+      }
+
+      // Find max for scaling
+      let maxMins = 1;
+      days.forEach(({ str }) => {
+        const dayTasks = tasks.filter(t => t.date === str);
+        const est  = dayTasks.reduce((s, t) => s + (t.estimatedTime || 0), 0);
+        const act  = dayTasks.reduce((s, t) => s + Math.round((t.timeSpent || 0) / 60), 0);
+        maxMins = Math.max(maxMins, est, act);
+      });
+
+      days.forEach(({ str, label }) => {
+        const dayTasks = tasks.filter(t => t.date === str);
+        const est  = dayTasks.reduce((s, t) => s + (t.estimatedTime || 0), 0);
+        const act  = dayTasks.reduce((s, t) => s + Math.round((t.timeSpent || 0) / 60), 0);
+
+        const estH = Math.round((est / maxMins) * 76);
+        const actH = Math.round((act / maxMins) * 76);
+
+        const col = document.createElement('div');
+        col.className = 'chart-col';
+        col.innerHTML = `
+          <div class="bar-group">
+            <div class="bar bar-est" style="height:${estH}px;" title="${est}m estimated"></div>
+            <div class="bar bar-act" style="height:${actH}px;" title="${act}m actual"></div>
+          </div>
+        `;
+        chartBars.appendChild(col);
+
+        const lbl = document.createElement('div');
+        lbl.className = 'chart-col';
+        lbl.innerHTML = `<span class="chart-day-label">${label}</span>`;
+        chartLabels.appendChild(lbl);
+      });
+
+      // Type breakdown: this week
+      const weekStart = new Date();
+      weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+      weekStart.setHours(0,0,0,0);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 7);
+
+      const weekTasks = tasks.filter(t => {
+        if (!t.date) return false;
+        const d = parseDate(t.date);
+        return d >= weekStart && d < weekEnd && (t.timeSpent > 0 || t.estimatedTime);
+      });
+
+      const byType = {};
+      weekTasks.forEach(t => {
+        const key = t.type || 'Untyped';
+        if (!byType[key]) byType[key] = { est: 0, act: 0 };
+        byType[key].est += t.estimatedTime || 0;
+        byType[key].act += Math.round((t.timeSpent || 0) / 60);
+      });
+
+      const tbody = document.getElementById('typeTableBody');
+      tbody.innerHTML = '';
+      const types = Object.keys(byType);
+      if (types.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No data yet this week. Complete assignments to see trends.</td></tr>';
+      } else {
+        types.forEach(type => {
+          const { est, act } = byType[type];
+          const diff = act - est;
+          const diffStr = diff === 0 ? '0m' : (diff > 0 ? '+' : '') + diff + 'm';
+          const diffClass = diff > 5 ? 'over' : diff <= 0 && act > 0 ? 'match' : '';
+          tbody.innerHTML += `
+            <tr>
+              <td>${type}</td>
+              <td>${formatMinsDirect(est)}</td>
+              <td>${act > 0 ? act + 'm' : '—'}</td>
+              <td class="${diffClass}">${act > 0 ? diffStr : '—'}</td>
+            </tr>
+          `;
+        });
+      }
+    }
+
+    // ─── Timer ────────────────────────────────────────────────
+    function toggleTimer(taskId) {
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) return;
+      const now = Date.now();
+      if (task.isTimerRunning) {
+        task.timeSpent += Math.floor((now - task.lastTimerStart) / 1000);
+        task.isTimerRunning = false;
+        task.lastTimerStart = null;
+      } else {
+        task.isTimerRunning = true;
+        task.lastTimerStart = now;
+      }
+      saveData();
+    }
+
+    function updateRunningTimers() {
+      const now = Date.now();
+      tasks.forEach(task => {
+        if (!task.isTimerRunning || task.archived) return;
+        const el = document.getElementById(`timer-display-${task.id}`);
+        if (!el) return;
+        const total = (task.timeSpent || 0) + Math.floor((now - task.lastTimerStart) / 1000);
+        el.textContent = formatMins(total);
+        el.classList.add('running');
+      });
+    }
+    setInterval(updateRunningTimers, 1000);
+
+    // ─── Subtasks ─────────────────────────────────────────────
+    function addSubtask(taskId) {
+      const input = document.getElementById(`subtask-input-${taskId}`);
+      const text = input.value.trim();
+      if (!text) return;
+      const task = tasks.find(t => t.id === taskId);
+      if (task) {
+        task.subtasks.push({ id: Date.now() + Math.random(), text, done: false });
+        input.value = '';
+        saveData();
+      }
+    }
+    function toggleSubtask(taskId, subtaskId) {
+      const task = tasks.find(t => t.id === taskId);
+      if (task) {
+        const st = task.subtasks.find(s => s.id === subtaskId);
+        if (st) { st.done = !st.done; saveData(); }
+      }
+    }
+
+    // ─── Completion Modal ─────────────────────────────────────
+    function openCompletionModal(taskId) {
+      taskToComplete = tasks.find(t => t.id === taskId);
+      if (!taskToComplete) return;
+      if (taskToComplete.isTimerRunning) {
+        const now = Date.now();
+        taskToComplete.timeSpent += Math.floor((now - taskToComplete.lastTimerStart) / 1000);
+        taskToComplete.isTimerRunning = false;
+        taskToComplete.lastTimerStart = null;
+        saveData();
+      }
+      document.getElementById('completionTaskTitle').textContent = taskToComplete.title;
+      document.getElementById('completionTimeInput').value = Math.floor((taskToComplete.timeSpent || 0) / 60);
+      const stDiv = document.getElementById('completionSubtasksList');
+      if (!taskToComplete.subtasks.length) {
+        stDiv.innerHTML = '<span style="font-size:0.82rem;color:var(--text-3);">No subtasks recorded.</span>';
+      } else {
+        stDiv.innerHTML = taskToComplete.subtasks.map(st => `
+          <label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;font-size:0.85rem;cursor:pointer;">
+            <input type="checkbox" id="comp-sub-${st.id}" ${st.done ? 'checked' : ''} style="accent-color:var(--accent);">
+            ${st.text}
+          </label>
+        `).join('');
+      }
+      openModal('completionModal');
+    }
+
+    function confirmCompletion() {
+      if (!taskToComplete) return;
+      const mins = parseInt(document.getElementById('completionTimeInput').value) || 0;
+      taskToComplete.timeSpent = mins * 60;
+      taskToComplete.subtasks.forEach(st => {
+        const cb = document.getElementById(`comp-sub-${st.id}`);
+        if (cb) st.done = cb.checked;
+      });
+
+      if (taskToComplete.recurring) {
+        const d = parseDate(taskToComplete.date);
+        d.setDate(d.getDate() + 7);
+        const next = d.toISOString().split('T')[0];
+        tasks.push({
+          id: Date.now(), title: taskToComplete.title, date: next,
+          classId: taskToComplete.classId, recurring: true, archived: false,
+          type: taskToComplete.type, estimatedTime: taskToComplete.estimatedTime,
+          timeSpent: 0, isTimerRunning: false, lastTimerStart: null,
+          subtasks: taskToComplete.subtasks.map(st => ({ id: Date.now() + Math.random(), text: st.text, done: false }))
+        });
+      }
+      taskToComplete.archived = true;
+      saveData();
+      closeModal('completionModal');
+    }
+
+    // ─── Edit Modal ───────────────────────────────────────────
+    function openEditModal(taskId) {
+      taskToEdit = tasks.find(t => t.id === taskId);
+      if (!taskToEdit) return;
+      document.getElementById('editTaskTitle').value    = taskToEdit.title || '';
+      document.getElementById('editTaskDate').value     = taskToEdit.date  || '';
+      document.getElementById('editTaskTime').value     = taskToEdit.estimatedTime || '';
+      document.getElementById('editTaskRecurring').checked = !!taskToEdit.recurring;
+      openModal('editModal');
+    }
+
+    function saveEditTask() {
+      if (!taskToEdit) return;
+      const title = document.getElementById('editTaskTitle').value.trim();
+      const date  = document.getElementById('editTaskDate').value;
+      if (!title || !date) return;
+      taskToEdit.title = title;
+      taskToEdit.date  = date;
+      taskToEdit.estimatedTime = parseInt(document.getElementById('editTaskTime').value) || null;
+      taskToEdit.recurring = document.getElementById('editTaskRecurring').checked;
+      saveData();
+      closeModal('editModal');
+    }
+
+    // ─── Modal helpers ────────────────────────────────────────
+    function openModal(id)  { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    // Close modal on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+    });
+
+    // ─── Sortable ─────────────────────────────────────────────
+    new Sortable(document.getElementById('taskList'), {
+      animation: 150,
+      ghostClass: 'sortable-ghost',
+      onEnd(evt) {
+        const ids = Array.from(document.getElementById('taskList').children).map(c => parseInt(c.dataset.id));
+        const active   = tasks.filter(t => !t.archived);
+        const archived = tasks.filter(t =>  t.archived);
+        const reordered = ids.map(id => active.find(t => t.id === id)).filter(Boolean);
+        tasks = [...reordered, ...archived];
+        localStorage.setItem('schoolTrackerTasks', JSON.stringify(tasks));
+      }
+    });
+
+    // ─── Export / Import ──────────────────────────────────────
+    function exportData() {
+      const blob = new Blob([JSON.stringify({ tasks, classes }, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `school_tracker_${todayString()}.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function importData(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (data.tasks && data.classes) {
+            tasks = data.tasks; classes = data.classes;
+            saveClasses(); saveData(); updateTermLabel();
+          }
+        } catch { alert('Import failed — the file may be corrupted.'); }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    }
+
+    // ─── Init ─────────────────────────────────────────────────
+    renderClasses();
+    populateClassDropdown();
+    updateTermLabel();
+    render();
+  </script>
+</body>
+</html>
