@@ -437,7 +437,7 @@
             <div class="brain-wrap" id="brainWrap"></div>
             <div class="load-readout">
               <div class="load-zone" id="loadZone">—</div>
-              <div class="load-sub" id="loadSub">Your typical daily workload over the past 7 days, measured against your fatigue limits.</div>
+              <div class="load-sub" id="loadSub">Your typical daily workload over the next 7 days, measured against your fatigue limits.</div>
             </div>
           </div>
           <div class="per-class" id="perClassBreakdown"></div>
@@ -841,13 +841,14 @@
   }
 
   // ── Cognitive load model ─────────────────────────────────────
-  // Rolling 7-day average of daily workload vs. capacity.
+  // Rolling average of daily workload vs. capacity over the week AHEAD
+  // (today + next 6 days), so scheduling upcoming work moves the gauge.
   // Capacity = sum of class fatigue limits. Load per day = actual minutes
   // logged where available, otherwise the estimate, for tasks tied to an
   // active class. Time is attributed to a task's due date.
-  function last7Days(){
+  function fatigueWindowDays(){
     const days=[];
-    for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0]);}
+    for(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()+i);days.push(d.toISOString().split('T')[0]);}
     return days;
   }
   function taskMinutes(t){ return t.timeSpent>0 ? Math.round(t.timeSpent/60) : (t.estimatedTime||0); }
@@ -857,11 +858,11 @@
     if(!active.length) return null;
     const ids=new Set(active.map(c=>c.id));
     const totalCap=active.reduce((s,c)=>s+(c.fatigueLimit||0),0);
-    const days=last7Days();
+    const days=fatigueWindowDays();
 
     function dayLoad(dstr,classId){
       return tasks
-        .filter(t=>t.date===dstr && t.classId && ids.has(t.classId) && (classId?t.classId===classId:true))
+        .filter(t=>!t.archived && t.date===dstr && t.classId && ids.has(t.classId) && (classId?t.classId===classId:true))
         .reduce((s,t)=>s+taskMinutes(t),0);
     }
 
@@ -932,7 +933,7 @@
     zoneEl.textContent=z.label;
     zoneEl.className='load-zone z-'+z.key;
     const pctTxt=Math.round(data.rolling*100);
-    subEl.textContent=`Your typical day runs at about ${pctTxt}% of your fatigue capacity, averaged across the last 7 days.`;
+    subEl.textContent=`Your typical day runs at about ${pctTxt}% of your fatigue capacity, averaged across the next 7 days.`;
 
     pcEl.innerHTML='';
     data.perClass.forEach(c=>{
