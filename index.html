@@ -286,6 +286,40 @@
     /* ── History ─────────────────────────────────────────────── */
     .hist-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:1.35rem;box-shadow:var(--shadow-sm);margin-bottom:1.1rem;}
     .hist-title{font-family:var(--display);font-size:1.05rem;font-weight:500;color:var(--ink);margin-bottom:1.1rem;}
+
+    /* Cognitive load brain */
+    .load-main{display:flex;align-items:center;gap:1.35rem;margin-bottom:1.1rem;}
+    .brain-wrap{width:104px;height:104px;flex-shrink:0;}
+    .brain-wrap svg{display:block;width:100%;height:100%;}
+    .load-readout{flex:1;min-width:0;}
+    .load-zone{font-family:var(--display);font-size:1.55rem;font-weight:600;line-height:1.1;letter-spacing:-.01em;margin-bottom:.4rem;}
+    .load-zone.z-light{color:var(--sage);}
+    .load-zone.z-balanced{color:var(--sage-deep);}
+    .load-zone.z-heavy{color:var(--amber);}
+    .load-zone.z-over{color:var(--brick);}
+    .load-sub{font-size:.82rem;color:var(--ink-soft);line-height:1.5;}
+
+    .per-class{display:flex;flex-direction:column;gap:.7rem;border-top:1px solid var(--line);padding-top:1.1rem;}
+    .pc-row{display:grid;grid-template-columns:88px 1fr auto;align-items:center;gap:.75rem;}
+    .pc-name{font-size:.82rem;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .pc-track{height:8px;background:var(--inset);border-radius:var(--r-f);overflow:hidden;}
+    .pc-fill{height:100%;border-radius:var(--r-f);transition:width .5s ease;}
+    .pc-tag{font-size:.72rem;font-weight:600;white-space:nowrap;}
+    .pc-tag.z-light{color:var(--sage);}
+    .pc-tag.z-balanced{color:var(--sage-deep);}
+    .pc-tag.z-heavy{color:var(--amber);}
+    .pc-tag.z-over{color:var(--brick);}
+
+    /* Observations */
+    .obs-item{display:flex;gap:.65rem;align-items:flex-start;padding:.55rem 0;font-size:.9rem;color:var(--ink);line-height:1.5;}
+    .obs-item:not(:last-child){border-bottom:1px solid var(--line);}
+    .obs-item .ms{color:var(--sage-deep);font-size:20px;flex-shrink:0;margin-top:1px;}
+
+    /* Brain whimsy: gentle surface motion; respect reduced motion */
+    @keyframes brainBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-1.5px);}}
+    .brain-bob{animation:brainBob 3.2s ease-in-out infinite;}
+    @media(prefers-reduced-motion:reduce){.brain-bob{animation:none;}}
+
     .chart-legend{display:flex;gap:1.35rem;margin-bottom:.85rem;}
     .legend-item{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--ink-soft);}
     .legend-sw{width:12px;height:12px;border-radius:3px;}
@@ -366,7 +400,7 @@
       <div class="rail-ind"><span class="ms">folder</span></div><span>By Class</span>
     </button>
     <button class="rail-item" onclick="switchTab('history')" id="rail-history">
-      <div class="rail-ind"><span class="ms">bar_chart</span></div><span>History</span>
+      <div class="rail-ind"><span class="ms">psychology</span></div><span>Insights</span>
     </button>
     <button class="rail-item" onclick="switchTab('classes')" id="rail-classes">
       <div class="rail-ind"><span class="ms">class</span></div><span>Classes</span>
@@ -392,9 +426,29 @@
         <div id="byClassList"></div>
       </div>
 
-      <!-- History -->
+      <!-- Insights -->
       <div class="tab-panel" id="tab-history">
-        <div class="page-eyebrow">History</div>
+        <div class="page-eyebrow">Insights</div>
+
+        <!-- Cognitive load brain -->
+        <div class="hist-card load-card" id="loadCard">
+          <div class="hist-title">Cognitive load</div>
+          <div class="load-main">
+            <div class="brain-wrap" id="brainWrap"></div>
+            <div class="load-readout">
+              <div class="load-zone" id="loadZone">—</div>
+              <div class="load-sub" id="loadSub">Your typical daily workload over the past 7 days, measured against your fatigue limits.</div>
+            </div>
+          </div>
+          <div class="per-class" id="perClassBreakdown"></div>
+        </div>
+
+        <!-- Observations -->
+        <div class="hist-card">
+          <div class="hist-title">Observations</div>
+          <div id="observations"></div>
+        </div>
+
         <div class="hist-card">
           <div class="hist-title">Last 7 days — estimated vs. actual</div>
           <div class="chart-legend">
@@ -453,7 +507,7 @@
         <div class="nav-ind"><span class="ms">add</span></div><span>Add</span>
       </button>
       <button class="nav-item" onclick="switchTab('history')" id="nav-history">
-        <div class="nav-ind"><span class="ms">bar_chart</span></div><span>History</span>
+        <div class="nav-ind"><span class="ms">psychology</span></div><span>Insights</span>
       </button>
       <button class="nav-item" onclick="switchTab('classes')" id="nav-classes">
         <div class="nav-ind"><span class="ms">class</span></div><span>Classes</span>
@@ -786,7 +840,162 @@
     if(!l.innerHTML)l.innerHTML='<p class="empty">No active assignments.</p>';
   }
 
+  // ── Cognitive load model ─────────────────────────────────────
+  // Rolling 7-day average of daily workload vs. capacity.
+  // Capacity = sum of class fatigue limits. Load per day = actual minutes
+  // logged where available, otherwise the estimate, for tasks tied to an
+  // active class. Time is attributed to a task's due date.
+  function last7Days(){
+    const days=[];
+    for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0]);}
+    return days;
+  }
+  function taskMinutes(t){ return t.timeSpent>0 ? Math.round(t.timeSpent/60) : (t.estimatedTime||0); }
+
+  function computeFatigue(){
+    const active=classes.filter(c=>!c.archived);
+    if(!active.length) return null;
+    const ids=new Set(active.map(c=>c.id));
+    const totalCap=active.reduce((s,c)=>s+(c.fatigueLimit||0),0);
+    const days=last7Days();
+
+    function dayLoad(dstr,classId){
+      return tasks
+        .filter(t=>t.date===dstr && t.classId && ids.has(t.classId) && (classId?t.classId===classId:true))
+        .reduce((s,t)=>s+taskMinutes(t),0);
+    }
+
+    const combinedRatios=days.map(d=> totalCap>0 ? dayLoad(d)/totalCap : 0);
+    const rolling=combinedRatios.reduce((a,b)=>a+b,0)/combinedRatios.length;
+
+    const perClass=active.map(c=>{
+      const cap=c.fatigueLimit||0;
+      const ratios=days.map(d=> cap>0 ? dayLoad(d,c.id)/cap : 0);
+      const avg=ratios.reduce((a,b)=>a+b,0)/ratios.length;
+      return {name:c.name,color:c.color,ratio:avg};
+    }).sort((a,b)=>b.ratio-a.ratio);
+
+    return {rolling,perClass};
+  }
+
+  function loadZone(r){
+    if(r<0.5)  return {label:'Light',      key:'light'};
+    if(r<0.85) return {label:'Balanced',   key:'balanced'};
+    if(r<=1.10)return {label:'Heavy',      key:'heavy'};
+    return       {label:'Overloaded', key:'over'};
+  }
+  const ZONE_COLOR={light:'var(--sage)',balanced:'var(--sage-deep)',heavy:'var(--amber)',over:'var(--brick)'};
+
+  // Brain SVG with a liquid fill that rises with load. fillPct 0..1+.
+  function buildBrainSVG(fillPct,zoneKey){
+    const pct=Math.max(0,Math.min(1,fillPct));      // clamp visual fill 0..1
+    const fillColor=ZONE_COLOR[zoneKey];
+    const top=100-pct*100;                            // y of liquid surface in viewBox units
+    const brain="M50 16 C40 9,27 11,23 21 C14 21,10 30,15 38 C8 45,11 55,20 59 C17 69,26 78,37 75 C41 84,53 84,59 77 C70 81,80 72,77 61 C85 57,85 45,78 41 C83 32,76 23,66 24 C62 13,52 10,50 16 Z";
+    const wave=`M0 ${top} q 12 -4 25 0 t 25 0 t 25 0 t 25 0 V100 H0 Z`;
+    return `
+      <svg viewBox="0 0 100 100" class="${zoneKey==='over'?'':'brain-bob'}" aria-hidden="true">
+        <defs>
+          <clipPath id="brainClip"><path d="${brain}"/></clipPath>
+        </defs>
+        <path d="${brain}" fill="var(--inset)"/>
+        <g clip-path="url(#brainClip)">
+          <rect x="0" y="${top}" width="100" height="${100-top}" fill="${fillColor}" opacity="0.85" style="transition:y .6s ease,height .6s ease"/>
+          <path d="${wave}" fill="${fillColor}" opacity="0.45"/>
+          <circle cx="34" cy="${Math.min(96,top+14)}" r="2.4" fill="#fff" opacity="0.35"/>
+          <circle cx="60" cy="${Math.min(96,top+22)}" r="1.7" fill="#fff" opacity="0.3"/>
+        </g>
+        <path d="${brain}" fill="none" stroke="var(--ink-soft)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M50 18 C46 30,54 42,49 54 C45 63,52 70,50 76" fill="none" stroke="var(--ink-soft)" stroke-width="1.4" opacity="0.55" stroke-linecap="round"/>
+        <path d="M32 30 q 8 4 4 12" fill="none" stroke="var(--ink-soft)" stroke-width="1.2" opacity="0.4" stroke-linecap="round"/>
+        <path d="M66 34 q -8 4 -3 12" fill="none" stroke="var(--ink-soft)" stroke-width="1.2" opacity="0.4" stroke-linecap="round"/>
+      </svg>`;
+  }
+
+  function renderFatigue(){
+    const wrap=document.getElementById('brainWrap');
+    const zoneEl=document.getElementById('loadZone');
+    const subEl=document.getElementById('loadSub');
+    const pcEl=document.getElementById('perClassBreakdown');
+    const data=computeFatigue();
+
+    if(!data){
+      wrap.innerHTML=buildBrainSVG(0,'light');
+      zoneEl.textContent='—';zoneEl.className='load-zone';
+      subEl.textContent='Add classes with fatigue limits to start tracking your cognitive load.';
+      pcEl.innerHTML='';
+      return;
+    }
+
+    const z=loadZone(data.rolling);
+    wrap.innerHTML=buildBrainSVG(data.rolling,z.key);
+    zoneEl.textContent=z.label;
+    zoneEl.className='load-zone z-'+z.key;
+    const pctTxt=Math.round(data.rolling*100);
+    subEl.textContent=`Your typical day runs at about ${pctTxt}% of your fatigue capacity, averaged across the last 7 days.`;
+
+    pcEl.innerHTML='';
+    data.perClass.forEach(c=>{
+      const z2=loadZone(c.ratio);
+      const w=Math.max(2,Math.min(100,c.ratio*100));
+      const row=document.createElement('div');row.className='pc-row';
+      row.innerHTML=`
+        <span class="pc-name">${c.name}</span>
+        <span class="pc-track"><span class="pc-fill" style="width:${w}%;background:${ZONE_COLOR[z2.key]};"></span></span>
+        <span class="pc-tag z-${z2.key}">${z2.label}</span>`;
+      pcEl.appendChild(row);
+    });
+  }
+
+  // ── Observations: plain-language patterns from the data ──────
+  function renderObservations(){
+    const box=document.getElementById('observations');
+    const obs=[];
+
+    const done=tasks.filter(t=>t.estimatedTime>0 && t.timeSpent>0);
+    if(done.length>=2){
+      const byType={};
+      done.forEach(t=>{const k=t.type||'Untyped';if(!byType[k])byType[k]={est:0,act:0,n:0};byType[k].est+=t.estimatedTime;byType[k].act+=Math.round(t.timeSpent/60);byType[k].n++;});
+      let worst=null;
+      Object.entries(byType).forEach(([type,v])=>{
+        if(v.n<2||v.est===0)return;
+        const dev=(v.act-v.est)/v.est;
+        if(!worst||Math.abs(dev)>Math.abs(worst.dev))worst={type,dev,n:v.n};
+      });
+      if(worst&&Math.abs(worst.dev)>=0.15){
+        const pct=Math.round(Math.abs(worst.dev)*100);
+        if(worst.dev>0) obs.push({icon:'trending_up',text:`You tend to <strong>underestimate ${worst.type}s</strong> — they take about ${pct}% longer than you plan. Consider padding those estimates.`});
+        else            obs.push({icon:'trending_down',text:`You tend to <strong>overestimate ${worst.type}s</strong> — they take about ${pct}% less time than you plan. You may have more room than you think.`});
+      }
+    }
+
+    const next7={};
+    for(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()+i);const s=d.toISOString().split('T')[0];next7[s]=0;}
+    tasks.filter(t=>!t.archived).forEach(t=>{if(next7[t.date]!==undefined)next7[t.date]+=(t.estimatedTime||0);});
+    const heavy=Object.entries(next7).sort((a,b)=>b[1]-a[1])[0];
+    if(heavy&&heavy[1]>0){
+      const d=parseDate(heavy[0]);
+      const dayName=diffDays(heavy[0])===0?'today':diffDays(heavy[0])===1?'tomorrow':d.toLocaleDateString('en-US',{weekday:'long'});
+      obs.push({icon:'event',text:`Your heaviest day ahead is <strong>${dayName}</strong> with ${fmtMin(heavy[1])} of planned work.`});
+    }
+
+    const fd=computeFatigue();
+    if(fd){
+      const z=loadZone(fd.rolling);
+      if(z.key==='over') obs.push({icon:'priority_high',text:`Your overall load has been <strong>over capacity</strong> this week. Look at spreading work earlier or trimming where you can.`});
+      else if(z.key==='light') obs.push({icon:'spa',text:`You've had a <strong>light week</strong> — a good window to get ahead on anything upcoming.`});
+    }
+
+    if(!obs.length){
+      box.innerHTML='<p class="empty">Log time on a few assignments and complete them, and patterns will start showing up here.</p>';
+      return;
+    }
+    box.innerHTML=obs.map(o=>`<div class="obs-item"><span class="ms">${o.icon}</span><span>${o.text}</span></div>`).join('');
+  }
+
   function renderHistory(){
+    renderFatigue();
+    renderObservations();
     const cb=document.getElementById('chartBars'),cl=document.getElementById('chartLabels');cb.innerHTML='';cl.innerHTML='';
     const days=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push({str:d.toISOString().split('T')[0],label:d.toLocaleDateString('en-US',{weekday:'short'}).slice(0,2)});}
     let max=1;days.forEach(({str})=>{const dt=tasks.filter(t=>t.date===str);max=Math.max(max,dt.reduce((s,t)=>s+(t.estimatedTime||0),0),dt.reduce((s,t)=>s+Math.round((t.timeSpent||0)/60),0));});
