@@ -30,6 +30,7 @@
     window._fbSignOut = () => signOut(auth);
 
     let unsubT = null, unsubC = null;
+    let _initialRouteDone = false;
     onAuthStateChanged(auth, user => {
       if (user) {
         document.getElementById('authScreen').style.display = 'none';
@@ -38,6 +39,14 @@
         unsubC = onSnapshot(collection(db,'users',user.uid,'classes'), s => {
           classes = s.docs.map(d=>({id:d.id,...d.data()}));
           populateClassDropdown(); renderClassesTab(); render();
+          // On the very first load, if no classes exist yet, start the user
+          // in the Classes tab so up-front setup comes first.
+          if(!_initialRouteDone){
+            _initialRouteDone = true;
+            if(classes.filter(c=>!c.archived).length === 0){
+              switchTab('classes');
+            }
+          }
         });
         unsubT = onSnapshot(collection(db,'users',user.uid,'tasks'), s => {
           tasks = s.docs.map(d=>({id:d.id,...d.data()}));
@@ -46,6 +55,7 @@
       } else {
         if(unsubT) unsubT(); if(unsubC) unsubC();
         tasks=[]; classes=[];
+        _initialRouteDone = false;
         document.getElementById('authScreen').style.display = 'flex';
         document.getElementById('appShell').style.display   = 'none';
       }
@@ -242,6 +252,9 @@
     .modal-actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1.35rem;}
 
     /* ── Classes Tab ─────────────────────────────────────────── */
+    .cls-intro{font-size:.9rem;color:var(--ink-soft);line-height:1.55;margin-bottom:1.1rem;max-width:52ch;}
+    .cls-add-error{display:none;font-size:.82rem;color:var(--brick);margin-top:.65rem;}
+    .cls-add-error.show{display:block;}
     .cls-add-surface{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:1.35rem;margin-bottom:1.25rem;box-shadow:var(--shadow-sm);}
     .sec-lbl{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-faint);margin-bottom:.85rem;}
     .cls-add-row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:flex-end;}
@@ -403,15 +416,17 @@
       <!-- Classes -->
       <div class="tab-panel" id="tab-classes">
         <div class="page-eyebrow">Classes</div>
+        <p class="cls-intro">Set up your classes at the start of each term. The fatigue limit is the daily workload ceiling per class that triggers an overload warning when you schedule assignments.</p>
         <div class="cls-add-surface">
           <div class="sec-lbl">Add a class</div>
           <div class="cls-add-row">
             <div class="field" style="margin-bottom:0;"><label>Class name</label><input class="inp" id="className" type="text" placeholder="e.g. BUS 201" onkeydown="if(event.key==='Enter')addClass()"></div>
-            <div class="field" style="max-width:150px;margin-bottom:0;"><label>Fatigue limit (min)</label><input class="inp" id="classFatigue" type="number" placeholder="120"></div>
+            <div class="field" style="max-width:160px;margin-bottom:0;"><label>Fatigue limit (min) <span style="color:var(--brick);">*</span></label><input class="inp" id="classFatigue" type="number" min="1" placeholder="e.g. 120" onkeydown="if(event.key==='Enter')addClass()"></div>
             <input type="color" id="classColor" value="#5C8A7D"
                    style="width:42px;height:42px;border:1px solid var(--line-mid);border-radius:50%;cursor:pointer;background:none;padding:2px;align-self:flex-end;">
             <button class="btn btn-tonal btn-sm" onclick="addClass()" style="align-self:flex-end;">Add class</button>
           </div>
+          <div class="cls-add-error" id="classAddError"></div>
         </div>
         <div class="cls-list" id="classList"></div>
       </div>
@@ -628,8 +643,14 @@
 
   function populateClassDropdown(){
     const s=document.getElementById('taskClass'),v=s.value;
+    const active=classes.filter(c=>!c.archived);
+    if(!active.length){
+      // No classes set up yet — point the user to the Classes tab
+      s.innerHTML='<option value="">No classes yet — add them in the Classes tab</option>';
+      s.value='';return;
+    }
     s.innerHTML='<option value="">No class</option>';
-    classes.filter(c=>!c.archived).forEach(c=>s.innerHTML+=`<option value="${c.id}">${c.name}</option>`);
+    active.forEach(c=>s.innerHTML+=`<option value="${c.id}">${c.name}</option>`);
     s.value=v;
   }
 
@@ -666,11 +687,27 @@
   async function saveClassLimit(id){const cls=classes.find(c=>c.id===id);if(!cls)return;const v=parseInt(document.getElementById(`cls-limit-${id}`).value);if(!v||v<1)return;cls.fatigueLimit=v;await saveClass(cls);renderClassesTab();}
 
   async function addClass(){
-    const name=document.getElementById('className').value.trim();if(!name)return;
-    const fl=document.getElementById('classFatigue').value,color=document.getElementById('classColor').value;
-    const nc={id:String(Date.now()),name,color,fatigueLimit:fl?parseInt(fl):120,archived:false};
+    const nameEl=document.getElementById('className'), flEl=document.getElementById('classFatigue'), errEl=document.getElementById('classAddError');
+    const name=nameEl.value.trim();
+    const fl=parseInt(flEl.value);
+    // Validate: name and a real fatigue limit are both required
+    if(!name){
+      errEl.textContent='Enter a class name.';errEl.classList.add('show');
+      nameEl.style.borderColor='var(--brick)';setTimeout(()=>nameEl.style.borderColor='',1500);
+      nameEl.focus();return;
+    }
+    if(!fl||fl<1){
+      errEl.textContent='Set a fatigue limit (in minutes) — it drives the overload warnings.';errEl.classList.add('show');
+      flEl.style.borderColor='var(--brick)';setTimeout(()=>flEl.style.borderColor='',1500);
+      flEl.focus();return;
+    }
+    errEl.classList.remove('show');
+    const color=document.getElementById('classColor').value;
+    const nc={id:String(Date.now()),name,color,fatigueLimit:fl,archived:false};
     classes.push(nc);populateClassDropdown();renderClassesTab();
-    document.getElementById('className').value='';document.getElementById('classFatigue').value='';
+    // Clear form and refocus name so several classes can be entered in a row
+    nameEl.value='';flEl.value='';
+    nameEl.focus();
     await saveClass(nc);
   }
 
