@@ -800,6 +800,11 @@
     if(cls)chips+=`<span class="chip" style="background:${cls.color}1f;color:${cls.color};border-color:${cls.color}44;">${cls.name}</span>`;
     if(task.type)chips+=`<span class="chip"><span class="ms">${TICONS[task.type]||'task'}</span>${task.type}</span>`;
     if(task.recurring)chips+=`<span class="chip chip-recur"><span class="ms">repeat</span>Weekly</span>`;
+    // Subtasks chip — appears once the first step is added; shows done/total
+    if(task.subtasks.length){
+      const doneCount=task.subtasks.filter(s=>s.done).length;
+      chips+=`<span class="chip"><span class="ms">checklist</span>${doneCount}/${task.subtasks.length}</span>`;
+    }
 
     // Meta: days-left chip (active cards only) to the left of the due-date chip
     let metaHTML;
