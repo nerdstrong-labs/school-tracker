@@ -185,25 +185,27 @@
     .page-eyebrow{font-family:var(--display);font-size:1.4rem;font-weight:500;color:var(--ink);margin-bottom:1.1rem;letter-spacing:-.01em;}
 
     /* ── Task Cards ──────────────────────────────────────────── */
-    .task-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);margin-bottom:.65rem;overflow:hidden;cursor:pointer;border-left:3px solid var(--line-mid);box-shadow:var(--shadow-sm);transition:box-shadow .2s,transform .12s;}
+    .task-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);margin-bottom:.65rem;overflow:hidden;cursor:pointer;box-shadow:var(--shadow-sm);transition:box-shadow .2s;}
     .task-card:hover{box-shadow:var(--shadow-md);}
-    .task-card.expanded{border-left-color:var(--sage);box-shadow:var(--shadow-md);}
-    .u-overdue{border-left-color:var(--brick)!important;}
-    .u-today{border-left-color:var(--amber)!important;}
-    .u-week{border-left-color:#D2A24E!important;}
+    .task-card.expanded{box-shadow:var(--shadow-md);}
 
-    .card-top{display:flex;align-items:center;gap:.8rem;padding:1rem 1.1rem;min-height:64px;}
+    .card-top{padding:.9rem 1.1rem;}
+    .card-chip-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem;}
+    .card-headline{display:flex;align-items:center;gap:.7rem;min-height:26px;}
     .c-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
     .c-title{font-size:.95rem;font-weight:500;flex:1;line-height:1.35;color:var(--ink);}
-    .c-meta{display:flex;align-items:center;gap:.5rem;flex-shrink:0;}
-    .due-chip{font-size:.75rem;font-weight:500;color:var(--ink-soft);background:var(--inset);padding:.22rem .65rem;border-radius:var(--r-f);}
-    .u-dot{width:7px;height:7px;border-radius:50%;background:var(--ink-faint);flex-shrink:0;}
-    .u-overdue .u-dot{background:var(--brick);}
-    .u-today .u-dot{background:var(--amber);}
-    .u-week .u-dot{background:#D2A24E;}
+    .c-meta{display:flex;align-items:center;gap:.4rem;flex-shrink:0;}
+    .due-chip{font-size:.74rem;font-weight:500;color:var(--ink-soft);background:var(--inset);padding:.22rem .6rem;border-radius:var(--r-f);}
+    .days-chip{font-size:.74rem;font-weight:600;padding:.22rem .6rem;border-radius:var(--r-f);white-space:nowrap;}
+    .days-chip.d-overdue{background:var(--brick-tint);color:var(--brick);}
+    .days-chip.d-today{background:var(--amber-tint);color:var(--amber);}
+    .days-chip.d-week{background:#F2E8CE;color:#8A6A24;}
+    .days-chip.d-far{background:var(--inset);color:var(--ink-soft);}
 
     .card-body{display:none;border-top:1px solid var(--line);padding:1.1rem;}
     .task-card.expanded .card-body{display:block;}
+    .timer-row{margin-bottom:1rem;}
+    .card-actions-right{justify-content:flex-end;}
 
     .chip-row{display:flex;gap:.45rem;flex-wrap:wrap;margin-bottom:1rem;}
     .chip{display:inline-flex;align-items:center;gap:.3rem;font-size:.8rem;font-weight:500;padding:.28rem .7rem;border-radius:var(--r-f);border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);}
@@ -641,7 +643,6 @@
   function todayStr(){const t=new Date();return new Date(t.getTime()-t.getTimezoneOffset()*60000).toISOString().split('T')[0];}
   function parseDate(s){const[y,m,d]=s.split('-');return new Date(+y,m-1,+d);}
   function diffDays(s){const t=new Date();t.setHours(0,0,0,0);const d=parseDate(s);d.setHours(0,0,0,0);return Math.ceil((d-t)/86400000);}
-  function urgCls(s){if(!s)return'';const d=diffDays(s);if(d<0)return'u-overdue';if(d===0)return'u-today';if(d<=7)return'u-week';return'';}
   function friendlyDate(s){if(!s)return'—';const d=diffDays(s);if(d<0)return`${Math.abs(d)}d overdue`;if(d===0)return'Today';if(d===1)return'Tomorrow';if(d<=6)return parseDate(s).toLocaleDateString('en-US',{weekday:'short'});return parseDate(s).toLocaleDateString('en-US',{month:'short',day:'numeric'});}
   function fmtSec(s){const m=Math.floor(s/60);if(m<60)return m+'m';const h=Math.floor(m/60),r=m%60;return r?`${h}h ${r}m`:`${h}h`;}
   function fmtMin(m){if(!m)return'—';if(m<60)return m+'m';const h=Math.floor(m/60),r=m%60;return r?`${h}h ${r}m`:`${h}h`;}
@@ -777,35 +778,68 @@
     renderClassesTab();populateClassDropdown();render();closeModal('manageClassModal');
   }
 
+  function absDate(s){ if(!s)return'—'; return parseDate(s).toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
+  function daysLeftInfo(s){
+    if(!s) return {txt:'—',key:'far'};
+    const d=diffDays(s);
+    if(d<0)   return {txt:`${Math.abs(d)}d overdue`, key:'overdue'};
+    if(d===0) return {txt:'Today',  key:'today'};
+    if(d===1) return {txt:'1 day',  key:'week'};
+    if(d<=7)  return {txt:`${d} days`, key:'week'};
+    return      {txt:`${d} days`, key:'far'};
+  }
+
   function buildCard(task,isArchive=false){
     const div=document.createElement('div');
-    div.className=`task-card ${isArchive?'':urgCls(task.date)}`;div.dataset.id=task.id;
+    div.className='task-card';div.dataset.id=task.id;
     const cls=task.classId?classes.find(c=>c.id===task.classId):null;
     const dot=cls?cls.color:'var(--line-mid)';
 
-    const top=document.createElement('div');top.className='card-top';
-    top.innerHTML=`<div class="c-dot" style="background:${dot};"></div><div class="c-title">${task.title}</div><div class="c-meta"><span class="due-chip">${isArchive?task.date:friendlyDate(task.date)}</span>${!isArchive?'<div class="u-dot"></div>':''}</div>`;
-    if(!isArchive)top.onclick=()=>toggleCard(task.id,div);
-    div.appendChild(top);
-
-    const body=document.createElement('div');body.className='card-body';
+    // Chips (class, type, recurring) — shown above the title in every state
     let chips='';
     if(cls)chips+=`<span class="chip" style="background:${cls.color}1f;color:${cls.color};border-color:${cls.color}44;">${cls.name}</span>`;
     if(task.type)chips+=`<span class="chip"><span class="ms">${TICONS[task.type]||'task'}</span>${task.type}</span>`;
     if(task.recurring)chips+=`<span class="chip chip-recur"><span class="ms">repeat</span>Weekly</span>`;
+
+    // Meta: days-left chip (active cards only) to the left of the due-date chip
+    let metaHTML;
+    if(isArchive){
+      metaHTML=`<span class="due-chip">${absDate(task.date)}</span>`;
+    } else {
+      const dl=daysLeftInfo(task.date);
+      metaHTML=`<span class="days-chip d-${dl.key}">${dl.txt}</span><span class="due-chip">${absDate(task.date)}</span>`;
+    }
+
+    const top=document.createElement('div');top.className='card-top';
+    top.innerHTML=`
+      ${chips?`<div class="card-chip-row">${chips}</div>`:''}
+      <div class="card-headline">
+        <div class="c-dot" style="background:${dot};"></div>
+        <div class="c-title">${task.title}</div>
+        <div class="c-meta">${metaHTML}</div>
+      </div>`;
+    if(!isArchive)top.onclick=()=>toggleCard(task.id,div);
+    div.appendChild(top);
+
+    const body=document.createElement('div');body.className='card-body';
+
+    // Timer button — sits where the chips used to live, above the time row
+    const timerCls=task.isTimerRunning?'btn-err':'btn-outlined';
+    const timerIco=task.isTimerRunning?'pause':'play_arrow';
+    const timerTxt=task.isTimerRunning?'Stop':'Timer';
+    const timerRow=isArchive?'':`<div class="timer-row"><button class="btn ${timerCls} btn-sm" onclick="toggleTimer('${task.id}')"><span class="ms">${timerIco}</span>${timerTxt}</button></div>`;
 
     const sp=task.timeSpent||0;
     const timeRow=`<div class="time-row"><div class="time-card"><div class="t-label">Estimated</div><div class="t-val">${task.estimatedTime?fmtMin(task.estimatedTime):'—'}</div></div><div class="time-card"><div class="t-label">Actual</div><div class="t-val ${task.isTimerRunning?'running':''}" id="timer-display-${task.id}">${sp>0||task.isTimerRunning?fmtSec(sp):'—'}</div></div></div>`;
 
     const subHTML=task.subtasks.map(st=>`<div class="sub-item"><input type="checkbox" ${st.done?'checked':''} onchange="toggleSubtask('${task.id}','${st.id}')" ${isArchive?'disabled':''}><span class="sub-text ${st.done?'sub-done':''}">${st.text}</span></div>`).join('');
     const subInput=isArchive?'':`<div class="sub-add"><input class="inp" id="subtask-input-${task.id}" placeholder="Add a step…" style="font-size:.875rem;" onkeydown="if(event.key==='Enter')addSubtask('${task.id}')"><button class="btn btn-tonal btn-sm" onclick="addSubtask('${task.id}')">Add</button></div>`;
+    const subBlock=(task.subtasks.length||!isArchive)?`<div class="sub-list">${subHTML}${subInput}</div>`:'';
 
-    const timerCls=task.isTimerRunning?'btn-err':'btn-outlined';
-    const timerIco=task.isTimerRunning?'pause':'play_arrow';
-    const timerTxt=task.isTimerRunning?'Stop':'Timer';
-    const actions=isArchive?'':`<div class="card-actions"><button class="btn ${timerCls} btn-sm" onclick="toggleTimer('${task.id}')"><span class="ms">${timerIco}</span>${timerTxt}</button><button class="btn btn-outlined btn-sm" onclick="openEditModal('${task.id}')"><span class="ms">edit</span>Edit</button><button class="btn btn-good btn-sm" onclick="openCompletionModal('${task.id}')"><span class="ms">check</span>Done</button></div>`;
+    // Edit + Done, right-aligned (timer no longer lives here)
+    const actions=isArchive?'':`<hr class="divider"><div class="card-actions card-actions-right"><button class="btn btn-outlined btn-sm" onclick="openEditModal('${task.id}')"><span class="ms">edit</span>Edit</button><button class="btn btn-good btn-sm" onclick="openCompletionModal('${task.id}')"><span class="ms">check</span>Done</button></div>`;
 
-    body.innerHTML=`${chips?`<div class="chip-row">${chips}</div>`:''}${timeRow}${task.subtasks.length||!isArchive?`<div class="sub-list">${subHTML}${subInput}</div>`:''}${actions?`<hr class="divider">${actions}`:''}`;
+    body.innerHTML=`${timerRow}${timeRow}${subBlock}${actions}`;
     div.appendChild(body);return div;
   }
 
