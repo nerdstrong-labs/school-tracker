@@ -214,6 +214,13 @@
     .timer-row{margin-bottom:1rem;}
     .card-actions-right{justify-content:flex-end;}
 
+    /* Notes — one-line muted preview on the collapsed card, aligned under the title (past the dot) */
+    .c-notes-preview{margin-top:.4rem;padding-left:calc(9px + .7rem);font-size:.82rem;line-height:1.4;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    /* When the card opens, hide the preview so the full notes in the body take over */
+    .task-card.expanded .c-notes-preview{display:none;}
+    /* Full notes in the expanded body, sitting just under the title/chip block */
+    .card-notes{font-size:.9rem;line-height:1.5;color:var(--ink-soft);white-space:pre-wrap;word-break:break-word;margin-bottom:1rem;}
+
     /* ── Reminder banner ─────────────────────────────────────── */
     .reminder-banner{display:none;}
     .reminder-banner.show{display:block;margin-bottom:1.1rem;}
@@ -251,6 +258,7 @@
     .inp{width:100%;background:var(--inset-2);border:1px solid var(--line-mid);border-radius:var(--r-s);color:var(--ink);font-family:var(--body);font-size:.95rem;padding:.7rem .85rem;outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;}
     .inp:focus{border-color:var(--sage);box-shadow:0 0 0 3px var(--sage-tint);}
     .inp::placeholder{color:var(--ink-faint);}
+    textarea.inp{resize:vertical;min-height:4.5rem;line-height:1.45;}
     select.inp{cursor:pointer;}
 
     /* ── Modals ──────────────────────────────────────────────── */
@@ -547,6 +555,7 @@
       <button class="modal-close" onclick="closeModal('addModal')"><span class="ms" style="font-size:20px;">close</span></button>
     </div>
     <div class="field"><label>Title</label><input class="inp" id="taskTitle" type="text" placeholder="Assignment title" onkeydown="if(event.key==='Enter')addTask()"></div>
+    <div class="field"><label>Notes</label><textarea class="inp" id="taskNotes" rows="3" placeholder="Notes for this assignment (optional)"></textarea></div>
     <div class="form-row">
       <div class="field"><label>Due date</label><input class="inp" id="taskDate" type="date"></div>
       <div class="field"><label>Class</label>
@@ -612,6 +621,7 @@
     <span class="ms d-icon">edit</span>
     <div class="d-head">Edit assignment</div>
     <div class="d-field"><label>Title</label><input class="inp" type="text" id="editTaskTitle"></div>
+    <div class="d-field"><label>Notes</label><textarea class="inp" id="editTaskNotes" rows="3" placeholder="Notes for this assignment (optional)"></textarea></div>
     <div style="display:flex;gap:.75rem;">
       <div class="d-field" style="flex:1;"><label>Due date</label><input class="inp" type="date" id="editTaskDate"></div>
       <div class="d-field" style="flex:1;"><label>Est. time</label>
@@ -708,10 +718,10 @@
       return;
     }
     const reminderAt=document.getElementById('taskReminder').value||null;
-    const nt={id:String(Date.now()),title,date,classId:document.getElementById('taskClass').value||null,type:document.getElementById('taskType').value||null,estimatedTime:parseInt(document.getElementById('taskTime').value)||null,timeSpent:0,isTimerRunning:false,lastTimerStart:null,recurring:document.getElementById('taskRecurring').checked,archived:false,subtasks:[],reminderAt,reminderDone:false};
+    const nt={id:String(Date.now()),title,date,notes:document.getElementById('taskNotes').value.trim(),classId:document.getElementById('taskClass').value||null,type:document.getElementById('taskType').value||null,estimatedTime:parseInt(document.getElementById('taskTime').value)||null,timeSpent:0,isTimerRunning:false,lastTimerStart:null,recurring:document.getElementById('taskRecurring').checked,archived:false,subtasks:[],reminderAt,reminderDone:false};
     maybeRequestNotifPermission(reminderAt);
     tasks.push(nt);render();
-    ['taskTitle','taskDate','taskType','taskTime','taskClass','taskReminder'].forEach(id=>document.getElementById(id).value='');
+    ['taskTitle','taskDate','taskType','taskTime','taskClass','taskReminder','taskNotes'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('taskRecurring').checked=false;
     document.getElementById('fatigueWarning').style.display='none';
     document.getElementById('formOptional').classList.remove('open');
@@ -876,6 +886,8 @@
 
   setInterval(refreshReminders, 30000);
 
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
   function buildCard(task,isArchive=false){
     const div=document.createElement('div');
     div.className='task-card';div.dataset.id=task.id;
@@ -913,7 +925,8 @@
         <div class="c-dot" style="background:${dot};"></div>
         <div class="c-title">${task.title}</div>
         <div class="c-meta">${metaHTML}</div>
-      </div>`;
+      </div>
+      ${task.notes?`<div class="c-notes-preview">${esc(task.notes)}</div>`:''}`;
     if(!isArchive)top.onclick=()=>toggleCard(task.id,div);
     div.appendChild(top);
 
@@ -935,7 +948,9 @@
     // Edit + Done, right-aligned (timer no longer lives here)
     const actions=isArchive?'':`<hr class="divider"><div class="card-actions card-actions-right"><button class="btn btn-outlined btn-sm" onclick="openEditModal('${task.id}')"><span class="ms">edit</span>Edit</button><button class="btn btn-good btn-sm" onclick="openCompletionModal('${task.id}')"><span class="ms">check</span>Done</button></div>`;
 
-    body.innerHTML=`${timerRow}${timeRow}${subBlock}${actions}`;
+    const notesBlock=task.notes?`<div class="card-notes">${esc(task.notes)}</div>`:'';
+
+    body.innerHTML=`${notesBlock}${timerRow}${timeRow}${subBlock}${actions}`;
     div.appendChild(body);return div;
   }
 
@@ -1191,7 +1206,7 @@
     taskToComplete.subtasks.forEach(st=>{const cb=document.getElementById(`comp-sub-${st.id}`);if(cb)st.done=cb.checked;});
     if(taskToComplete.recurring){
       const d=parseDate(taskToComplete.date);d.setDate(d.getDate()+7);
-      const nt={id:String(Date.now()),title:taskToComplete.title,date:d.toISOString().split('T')[0],classId:taskToComplete.classId,recurring:true,archived:false,type:taskToComplete.type,estimatedTime:taskToComplete.estimatedTime,timeSpent:0,isTimerRunning:false,lastTimerStart:null,subtasks:taskToComplete.subtasks.map(st=>({id:String(Date.now()+Math.random()),text:st.text,done:false}))};
+      const nt={id:String(Date.now()),title:taskToComplete.title,date:d.toISOString().split('T')[0],notes:taskToComplete.notes||'',classId:taskToComplete.classId,recurring:true,archived:false,type:taskToComplete.type,estimatedTime:taskToComplete.estimatedTime,timeSpent:0,isTimerRunning:false,lastTimerStart:null,subtasks:taskToComplete.subtasks.map(st=>({id:String(Date.now()+Math.random()),text:st.text,done:false}))};
       tasks.push(nt);await saveTask(nt);
     }
     taskToComplete.archived=true;await saveTask(taskToComplete);closeModal('completionModal');
@@ -1200,6 +1215,7 @@
   function openEditModal(taskId){
     taskToEdit=tasks.find(t=>t.id===taskId);if(!taskToEdit)return;
     document.getElementById('editTaskTitle').value=taskToEdit.title||'';
+    document.getElementById('editTaskNotes').value=taskToEdit.notes||'';
     document.getElementById('editTaskDate').value=taskToEdit.date||'';
     document.getElementById('editTaskTime').value=taskToEdit.estimatedTime||'';
     document.getElementById('editTaskRecurring').checked=!!taskToEdit.recurring;
@@ -1211,6 +1227,7 @@
     const title=document.getElementById('editTaskTitle').value.trim(),date=document.getElementById('editTaskDate').value;
     if(!title||!date)return;
     taskToEdit.title=title;taskToEdit.date=date;
+    taskToEdit.notes=document.getElementById('editTaskNotes').value.trim();
     taskToEdit.estimatedTime=parseInt(document.getElementById('editTaskTime').value)||null;
     taskToEdit.recurring=document.getElementById('editTaskRecurring').checked;
     const newReminder=document.getElementById('editTaskReminder').value||null;
