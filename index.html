@@ -207,6 +207,1213 @@
     .timer-row{margin-bottom:1rem;}
     .card-actions-right{justify-content:flex-end;}
 
+    /* ── Reminder banner ─────────────────────────────────────── */
+    .reminder-banner{display:none;}
+    .reminder-banner.show{display:block;margin-bottom:1.1rem;}
+    .reminder-row{display:flex;align-items:center;gap:.75rem;background:var(--amber-tint);border:1px solid #E9D2A6;border-radius:var(--r-m);padding:.7rem .85rem;margin-bottom:.5rem;}
+    .reminder-row .ms-bell{color:var(--amber);font-size:22px;flex-shrink:0;}
+    .reminder-text{flex:1;min-width:0;display:flex;flex-direction:column;}
+    .reminder-text strong{font-size:.9rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .reminder-sub{font-size:.78rem;color:var(--ink-soft);}
+    .reminder-dismiss{background:none;border:none;cursor:pointer;color:var(--ink-soft);width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .reminder-dismiss:hover{background:rgba(43,49,46,.06);}
+
+    .chip-row{display:flex;gap:.45rem;flex-wrap:wrap;margin-bottom:1rem;}
+    .chip{display:inline-flex;align-items:center;gap:.3rem;font-size:.8rem;font-weight:500;padding:.28rem .7rem;border-radius:var(--r-f);border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);}
+    .chip .ms{font-size:14px;}
+    .chip-recur{background:var(--sage-tint);color:var(--on-sage-tint);border-color:transparent;}
+
+    .time-row{display:flex;gap:.75rem;margin-bottom:1.1rem;}
+    .time-card{flex:1;background:var(--inset);border-radius:var(--r-m);padding:.85rem;}
+    .t-label{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);margin-bottom:.3rem;}
+    .t-val{font-size:1.15rem;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;}
+    .t-val.running{color:var(--sage);}
+
+    .sub-list{margin-bottom:1.1rem;}
+    .sub-item{display:flex;align-items:center;gap:.65rem;padding:.4rem 0;}
+    .sub-item input[type=checkbox]{accent-color:var(--sage);width:18px;height:18px;cursor:pointer;flex-shrink:0;}
+    .sub-text{font-size:.88rem;color:var(--ink);}
+    .sub-done{text-decoration:line-through;color:var(--ink-faint);}
+    .sub-add{display:flex;gap:.5rem;margin-bottom:1.1rem;}
+    .sub-add input{flex:1;}
+    .card-actions{display:flex;gap:.5rem;flex-wrap:wrap;}
+
+    /* ── Inputs (soft outlined) ──────────────────────────────── */
+    .field{position:relative;margin-bottom:.85rem;}
+    .field label{display:block;font-size:.78rem;font-weight:500;color:var(--ink-soft);margin-bottom:.35rem;}
+    .inp{width:100%;background:var(--inset-2);border:1px solid var(--line-mid);border-radius:var(--r-s);color:var(--ink);font-family:var(--body);font-size:.95rem;padding:.7rem .85rem;outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;}
+    .inp:focus{border-color:var(--sage);box-shadow:0 0 0 3px var(--sage-tint);}
+    .inp::placeholder{color:var(--ink-faint);}
+    select.inp{cursor:pointer;}
+
+    /* ── Modals ──────────────────────────────────────────────── */
+    .overlay{display:none;position:fixed;inset:0;background:rgba(35,40,37,.4);align-items:center;justify-content:center;z-index:100;padding:1rem;backdrop-filter:blur(2px);}
+    .overlay.open{display:flex;}
+    .dialog{background:var(--surface);border-radius:var(--r-xl);padding:1.65rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);}
+
+    .add-modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.35rem;}
+    .add-modal-title{font-family:var(--display);font-size:1.3rem;font-weight:500;color:var(--ink);letter-spacing:-.01em;}
+    .modal-close{background:none;border:none;cursor:pointer;color:var(--ink-soft);display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:var(--r-f);}
+    .modal-close:hover{background:var(--inset);}
+
+    .form-row{display:flex;gap:.75rem;flex-wrap:wrap;}
+    .form-row .field{flex:1;min-width:120px;}
+    .form-expand{background:none;border:none;color:var(--sage);font-size:.875rem;font-weight:500;cursor:pointer;padding:.4rem 0;display:flex;align-items:center;gap:.25rem;font-family:var(--body);}
+    .form-opt{display:none;border-top:1px solid var(--line);padding-top:1rem;margin-top:.5rem;}
+    .form-opt.open{display:block;}
+    .fatigue-warn{display:none;background:var(--brick-tint);color:var(--brick);border-radius:var(--r-s);padding:.8rem 1rem;font-size:.875rem;line-height:1.5;margin-top:.85rem;}
+    .modal-actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:1.35rem;}
+
+    /* ── Classes Tab ─────────────────────────────────────────── */
+    .cls-intro{font-size:.9rem;color:var(--ink-soft);line-height:1.55;margin-bottom:1.1rem;max-width:52ch;}
+    .cls-add-error{display:none;font-size:.82rem;color:var(--brick);margin-top:.65rem;}
+    .cls-add-error.show{display:block;}
+    .cls-add-surface{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:1.35rem;margin-bottom:1.25rem;box-shadow:var(--shadow-sm);}
+    .sec-lbl{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-faint);margin-bottom:.85rem;}
+    .cls-add-row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:flex-end;}
+    .cls-add-row .field{flex:1;min-width:120px;margin-bottom:0;}
+
+    .cls-list{display:flex;flex-direction:column;gap:.65rem;}
+    .cls-row{display:flex;align-items:center;gap:.85rem;padding:1rem 1.1rem;}
+    .cls-color-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0;}
+    .cls-info{flex:1;}
+    .cls-name{font-size:.95rem;font-weight:600;color:var(--ink);}
+    .cls-meta{font-size:.8rem;color:var(--ink-soft);margin-top:.15rem;}
+    .cls-actions{display:flex;gap:.4rem;flex-shrink:0;}
+    .cls-edit-row{display:none;padding:.85rem 1.1rem;background:var(--inset);border-top:1px solid var(--line);}
+    .cls-edit-row.open{display:flex;gap:.75rem;align-items:flex-end;flex-wrap:wrap;}
+    .cls-edit-row .field{flex:1;min-width:120px;margin-bottom:0;}
+
+    /* ── By Class ────────────────────────────────────────────── */
+    .cls-group{margin-bottom:2rem;}
+    .cls-group-hdr{display:flex;align-items:center;gap:.8rem;padding:.5rem 0;margin-bottom:.7rem;border-bottom:1px solid var(--line);}
+    .cls-group-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0;}
+    .cls-group-name{font-size:.92rem;font-weight:600;color:var(--ink);}
+    .cls-group-count{font-size:.8rem;color:var(--ink-faint);margin-left:auto;}
+
+    /* ── Archive ─────────────────────────────────────────────── */
+    .archive-btn{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-f);color:var(--ink-soft);font-family:var(--body);font-size:.875rem;font-weight:500;padding:.7rem 1rem;cursor:pointer;margin-top:1rem;display:flex;align-items:center;justify-content:center;gap:.4rem;transition:box-shadow .2s;}
+    .archive-btn:hover{box-shadow:var(--shadow-sm);}
+    #archiveList{margin-top:.75rem;opacity:.7;}
+
+    /* ── History ─────────────────────────────────────────────── */
+    .hist-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);padding:1.35rem;box-shadow:var(--shadow-sm);margin-bottom:1.1rem;}
+    .hist-title{font-family:var(--display);font-size:1.05rem;font-weight:500;color:var(--ink);margin-bottom:1.1rem;}
+
+    /* Cognitive load brain */
+    .load-main{display:flex;align-items:center;gap:1.35rem;margin-bottom:1.1rem;}
+    .brain-wrap{width:104px;height:104px;flex-shrink:0;}
+    .brain-wrap svg{display:block;width:100%;height:100%;}
+    .load-readout{flex:1;min-width:0;}
+    .load-zone{font-family:var(--display);font-size:1.55rem;font-weight:600;line-height:1.1;letter-spacing:-.01em;margin-bottom:.4rem;}
+    .load-zone.z-light{color:var(--sage);}
+    .load-zone.z-balanced{color:var(--sage-deep);}
+    .load-zone.z-heavy{color:var(--amber);}
+    .load-zone.z-over{color:var(--brick);}
+    .load-sub{font-size:.82rem;color:var(--ink-soft);line-height:1.5;}
+
+    .per-class{display:flex;flex-direction:column;gap:.7rem;border-top:1px solid var(--line);padding-top:1.1rem;}
+    .pc-row{display:grid;grid-template-columns:88px 1fr auto;align-items:center;gap:.75rem;}
+    .pc-name{font-size:.82rem;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .pc-track{height:8px;background:var(--inset);border-radius:var(--r-f);overflow:hidden;}
+    .pc-fill{height:100%;border-radius:var(--r-f);transition:width .5s ease;}
+    .pc-tag{font-size:.72rem;font-weight:600;white-space:nowrap;}
+    .pc-tag.z-light{color:var(--sage);}
+    .pc-tag.z-balanced{color:var(--sage-deep);}
+    .pc-tag.z-heavy{color:var(--amber);}
+    .pc-tag.z-over{color:var(--brick);}
+
+    /* Observations */
+    .obs-item{display:flex;gap:.65rem;align-items:flex-start;padding:.55rem 0;font-size:.9rem;color:var(--ink);line-height:1.5;}
+    .obs-item:not(:last-child){border-bottom:1px solid var(--line);}
+    .obs-item .ms{color:var(--sage-deep);font-size:20px;flex-shrink:0;margin-top:1px;}
+
+    /* Brain whimsy: gentle surface motion; respect reduced motion */
+    @keyframes brainBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-1.5px);}}
+    .brain-bob{animation:brainBob 3.2s ease-in-out infinite;}
+    @media(prefers-reduced-motion:reduce){.brain-bob{animation:none;}}
+
+    .chart-legend{display:flex;gap:1.35rem;margin-bottom:.85rem;}
+    .legend-item{display:flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--ink-soft);}
+    .legend-sw{width:12px;height:12px;border-radius:3px;}
+    .chart-bars{display:flex;align-items:flex-end;gap:7px;height:92px;margin-bottom:.4rem;}
+    .chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;height:100%;justify-content:flex-end;}
+    .bar-group{display:flex;gap:3px;align-items:flex-end;width:100%;justify-content:center;}
+    .bar{width:44%;border-radius:4px 4px 0 0;min-height:2px;}
+    .bar-e{background:var(--sage);opacity:.32;}
+    .bar-a{background:var(--sage-deep);}
+    .day-lbl{font-size:.64rem;color:var(--ink-faint);text-align:center;font-weight:500;}
+    .chart-lbls{display:flex;gap:7px;}
+    .type-tbl{width:100%;border-collapse:collapse;}
+    .type-tbl th{text-align:left;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);padding:.4rem 0;border-bottom:1px solid var(--line);}
+    .type-tbl th:not(:first-child){text-align:right;}
+    .type-tbl td{font-size:.88rem;padding:.55rem 0;border-bottom:1px solid var(--line);color:var(--ink-soft);}
+    .type-tbl td:not(:first-child){text-align:right;color:var(--ink);font-variant-numeric:tabular-nums;}
+    .type-tbl td.over{color:var(--brick);}
+    .type-tbl td.match{color:var(--sage);}
+    .empty{font-size:.9rem;color:var(--ink-faint);padding:.6rem 0;line-height:1.5;}
+
+    /* ── Other Dialogs ───────────────────────────────────────── */
+    .d-icon{font-size:24px;color:var(--ink-soft);margin-bottom:1rem;display:block;}
+    .d-head{font-family:var(--display);font-size:1.3rem;font-weight:500;color:var(--ink);margin-bottom:.75rem;letter-spacing:-.01em;}
+    .d-body{font-size:.9rem;color:var(--ink-soft);line-height:1.55;margin-bottom:1.25rem;}
+    .d-actions{display:flex;gap:.5rem;justify-content:flex-end;flex-wrap:wrap;margin-top:1.25rem;}
+    .d-field{margin-bottom:1rem;}
+    .d-field label{display:block;font-size:.78rem;font-weight:500;color:var(--ink-soft);margin-bottom:.35rem;}
+
+    /* ── Footer ──────────────────────────────────────────────── */
+    .footer{display:flex;gap:.5rem;padding:1.5rem 1.1rem;flex-wrap:wrap;}
+
+    /* ── Misc ────────────────────────────────────────────────── */
+    .sortable-ghost{opacity:.3;}
+    .ms{font-family:'Material Symbols Outlined';font-size:18px;vertical-align:middle;user-select:none;font-style:normal;font-weight:normal;}
+    .card-soft{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);box-shadow:var(--shadow-sm);overflow:hidden;}
+    .divider{border:none;border-top:1px solid var(--line);margin:1rem 0;}
+  </style>
+</head>
+<body>
+
+<!-- ── Auth ──────────────────────────────────────────────────── -->
+<div id="authScreen">
+  <div class="auth-card">
+    <span class="ms auth-icon">school</span>
+    <h1>School Tracker</h1>
+    <p>Sign in to sync your assignments across all your devices.</p>
+    <button class="btn btn-filled" style="width:100%;" onclick="window._fbSignIn()">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20H24v8h11.3C33.6 33.1 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.1 6.5 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 19.7-8 19.7-20 0-1.3-.1-2.7-.1-4z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.1 18.9 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.1 6.5 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-1.9 13.5-5l-6.2-5.2C29.5 35.6 26.9 36 24 36c-5.2 0-9.6-2.8-11.3-7l-6.5 5C9.6 40 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20H24v8h11.3c-.9 2.5-2.6 4.6-4.8 6l6.2 5.2C40.5 36.1 44 30.5 44 24c0-1.3-.1-2.7-.4-4z"/></svg>
+      Sign in with Google
+    </button>
+  </div>
+</div>
+
+<!-- ── App ───────────────────────────────────────────────────── -->
+<div id="appShell">
+
+  <header class="top-bar">
+    <span class="ms" style="color:var(--sage);font-size:24px;">school</span>
+    <span class="top-bar-title">School Tracker</span>
+    <div class="top-bar-actions">
+      <span class="sync" id="syncIndicator">✓ saved</span>
+      <span id="userEmail"></span>
+      <button class="btn btn-text btn-sm" onclick="window._fbSignOut()">Sign out</button>
+    </div>
+  </header>
+
+  <!-- Nav Rail (desktop) -->
+  <nav class="nav-rail">
+    <button class="rail-add" onclick="openAddModal()">
+      <div class="rail-add-pill"><span class="ms" style="font-size:24px;">add</span></div>
+      <span class="rail-add-label">Add</span>
+    </button>
+    <div class="rail-divider"></div>
+    <button class="rail-item active" onclick="switchTab('due')" id="rail-due">
+      <div class="rail-ind"><span class="ms">event</span></div><span>Due Soon</span>
+    </button>
+    <button class="rail-item" onclick="switchTab('byclass')" id="rail-byclass">
+      <div class="rail-ind"><span class="ms">folder</span></div><span>By Class</span>
+    </button>
+    <button class="rail-item" onclick="switchTab('history')" id="rail-history">
+      <div class="rail-ind"><span class="ms">psychology</span></div><span>Insights</span>
+    </button>
+    <button class="rail-item" onclick="switchTab('classes')" id="rail-classes">
+      <div class="rail-ind"><span class="ms">class</span></div><span>Classes</span>
+    </button>
+  </nav>
+
+  <div class="app-body">
+    <div class="main">
+
+      <!-- Reminder banner (shows due reminders across all tabs) -->
+      <div class="reminder-banner" id="reminderBanner"></div>
+
+      <!-- Due Soon -->
+      <div class="tab-panel active" id="tab-due">
+        <div class="page-eyebrow">Due soon</div>
+        <div id="taskList"></div>
+        <button class="archive-btn" onclick="toggleArchive()">
+          <span class="ms">archive</span>Show archived assignments
+        </button>
+        <div id="archiveList" style="display:none;"></div>
+      </div>
+
+      <!-- By Class -->
+      <div class="tab-panel" id="tab-byclass">
+        <div class="page-eyebrow">By class</div>
+        <div id="byClassList"></div>
+      </div>
+
+      <!-- Insights -->
+      <div class="tab-panel" id="tab-history">
+        <div class="page-eyebrow">Insights</div>
+
+        <!-- Cognitive load brain -->
+        <div class="hist-card load-card" id="loadCard">
+          <div class="hist-title">Cognitive load</div>
+          <div class="load-main">
+            <div class="brain-wrap" id="brainWrap"></div>
+            <div class="load-readout">
+              <div class="load-zone" id="loadZone">—</div>
+              <div class="load-sub" id="loadSub">Your typical daily workload over the next 7 days, measured against your fatigue limits.</div>
+            </div>
+          </div>
+          <div class="per-class" id="perClassBreakdown"></div>
+        </div>
+
+        <!-- Observations -->
+        <div class="hist-card">
+          <div class="hist-title">Observations</div>
+          <div id="observations"></div>
+        </div>
+
+        <div class="hist-card">
+          <div class="hist-title">Last 7 days — estimated vs. actual</div>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-sw" style="background:var(--sage);opacity:.32;"></div>Estimated</div>
+            <div class="legend-item"><div class="legend-sw" style="background:var(--sage-deep);"></div>Actual</div>
+          </div>
+          <div class="chart-bars" id="chartBars"></div>
+          <div class="chart-lbls" id="chartLabels"></div>
+        </div>
+        <div class="hist-card">
+          <div class="hist-title">This week — by assignment type</div>
+          <table class="type-tbl">
+            <thead><tr><th>Type</th><th>Est.</th><th>Actual</th><th>Diff</th></tr></thead>
+            <tbody id="typeTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Classes -->
+      <div class="tab-panel" id="tab-classes">
+        <div class="page-eyebrow">Classes</div>
+        <p class="cls-intro">Set up your classes at the start of each term. The fatigue limit is the daily workload ceiling per class that triggers an overload warning when you schedule assignments.</p>
+        <div class="cls-add-surface">
+          <div class="sec-lbl">Add a class</div>
+          <div class="cls-add-row">
+            <div class="field" style="margin-bottom:0;"><label>Class name</label><input class="inp" id="className" type="text" placeholder="e.g. BUS 201" onkeydown="if(event.key==='Enter')addClass()"></div>
+            <div class="field" style="max-width:160px;margin-bottom:0;"><label>Fatigue limit (min) <span style="color:var(--brick);">*</span></label><input class="inp" id="classFatigue" type="number" min="1" placeholder="e.g. 120" onkeydown="if(event.key==='Enter')addClass()"></div>
+            <input type="color" id="classColor" value="#5C8A7D"
+                   style="width:42px;height:42px;border:1px solid var(--line-mid);border-radius:50%;cursor:pointer;background:none;padding:2px;align-self:flex-end;">
+            <button class="btn btn-tonal btn-sm" onclick="addClass()" style="align-self:flex-end;">Add class</button>
+          </div>
+          <div class="cls-add-error" id="classAddError"></div>
+        </div>
+        <div class="cls-list" id="classList"></div>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      <button class="btn btn-good btn-sm" onclick="exportData()"><span class="ms">download</span>Export backup</button>
+      <button class="btn btn-warn btn-sm" onclick="document.getElementById('importFile').click()"><span class="ms">upload</span>Import backup</button>
+      <input type="file" id="importFile" style="display:none;" accept=".json" onchange="importData(event)">
+    </div>
+  </div>
+
+  <!-- Bottom Nav (mobile) -->
+  <nav class="nav-bar">
+    <div class="nav-bar-inner">
+      <button class="nav-item active" onclick="switchTab('due')" id="nav-due">
+        <div class="nav-ind"><span class="ms">event</span></div><span>Due Soon</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('byclass')" id="nav-byclass">
+        <div class="nav-ind"><span class="ms">folder</span></div><span>By Class</span>
+      </button>
+      <button class="nav-item nav-item-add" onclick="openAddModal()" id="nav-add">
+        <div class="nav-ind"><span class="ms">add</span></div><span>Add</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('history')" id="nav-history">
+        <div class="nav-ind"><span class="ms">psychology</span></div><span>Insights</span>
+      </button>
+      <button class="nav-item" onclick="switchTab('classes')" id="nav-classes">
+        <div class="nav-ind"><span class="ms">class</span></div><span>Classes</span>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<!-- ── Add Assignment Modal ───────────────────────────────────── -->
+<div class="overlay" id="addModal">
+  <div class="dialog">
+    <div class="add-modal-header">
+      <span class="add-modal-title">New assignment</span>
+      <button class="modal-close" onclick="closeModal('addModal')"><span class="ms" style="font-size:20px;">close</span></button>
+    </div>
+    <div class="field"><label>Title</label><input class="inp" id="taskTitle" type="text" placeholder="Assignment title" onkeydown="if(event.key==='Enter')addTask()"></div>
+    <div class="form-row">
+      <div class="field"><label>Due date</label><input class="inp" id="taskDate" type="date"></div>
+      <div class="field"><label>Class</label>
+        <select class="inp" id="taskClass" onchange="checkFatigueWarning()"><option value="">No class</option></select>
+      </div>
+    </div>
+    <button class="form-expand" onclick="toggleFormOptions()" id="formExpandBtn">
+      <span class="ms">expand_more</span> More options
+    </button>
+    <div class="form-opt" id="formOptional">
+      <div class="form-row" style="margin-bottom:.75rem;">
+        <div class="field" style="margin-bottom:0;"><label>Type</label>
+          <select class="inp" id="taskType">
+            <option value="">No type</option><option>Quiz</option><option>Discussion</option>
+            <option>Lab</option><option>Project</option><option>Exam</option><option>Extra Credit</option>
+          </select>
+        </div>
+        <div class="field" style="margin-bottom:0;"><label>Est. time</label>
+          <select class="inp" id="taskTime" onchange="checkFatigueWarning()">
+            <option value="">—</option><option value="15">15 min</option><option value="30">30 min</option>
+            <option value="60">1 hr</option><option value="90">1.5 hrs</option>
+            <option value="120">2 hrs</option><option value="180">3 hrs</option><option value="240">4 hrs</option>
+          </select>
+        </div>
+        <div class="field" style="min-width:80px;max-width:95px;margin-bottom:0;display:flex;flex-direction:column;justify-content:flex-end;">
+          <label>&nbsp;</label>
+          <label style="display:flex;align-items:center;gap:.4rem;font-size:.875rem;color:var(--ink-soft);padding-bottom:.7rem;cursor:pointer;">
+            <input type="checkbox" id="taskRecurring" style="accent-color:var(--sage);width:18px;height:18px;"> Weekly
+          </label>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:0;"><label>Reminder (optional)</label><input class="inp" id="taskReminder" type="datetime-local"></div>
+      <div class="fatigue-warn" id="fatigueWarning"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-text" onclick="closeModal('addModal')">Cancel</button>
+      <button class="btn btn-filled" onclick="addTask()"><span class="ms">add</span>Add assignment</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Completion Modal ───────────────────────────────────────── -->
+<div class="overlay" id="completionModal">
+  <div class="dialog">
+    <span class="ms d-icon">check_circle</span>
+    <div class="d-head">Mark complete</div>
+    <div id="completionTaskTitle" style="font-size:.95rem;font-weight:600;color:var(--sage);margin-bottom:1rem;"></div>
+    <div class="d-field"><label>Total time spent (minutes)</label><input class="inp" type="number" id="completionTimeInput"></div>
+    <div class="d-field">
+      <label>Subtasks</label>
+      <div id="completionSubtasksList" style="background:var(--inset);border-radius:var(--r-s);padding:.85rem;"></div>
+    </div>
+    <div class="d-actions">
+      <button class="btn btn-text" onclick="closeModal('completionModal')">Cancel</button>
+      <button class="btn btn-good" onclick="confirmCompletion()"><span class="ms">check</span>Save &amp; complete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Edit Modal ─────────────────────────────────────────────── -->
+<div class="overlay" id="editModal">
+  <div class="dialog">
+    <span class="ms d-icon">edit</span>
+    <div class="d-head">Edit assignment</div>
+    <div class="d-field"><label>Title</label><input class="inp" type="text" id="editTaskTitle"></div>
+    <div style="display:flex;gap:.75rem;">
+      <div class="d-field" style="flex:1;"><label>Due date</label><input class="inp" type="date" id="editTaskDate"></div>
+      <div class="d-field" style="flex:1;"><label>Est. time</label>
+        <select class="inp" id="editTaskTime">
+          <option value="">—</option><option value="15">15 min</option><option value="30">30 min</option>
+          <option value="60">1 hr</option><option value="90">1.5 hrs</option>
+          <option value="120">2 hrs</option><option value="180">3 hrs</option><option value="240">4 hrs</option>
+        </select>
+      </div>
+    </div>
+    <div class="d-field">
+      <label style="display:flex;align-items:center;gap:.5rem;color:var(--ink-soft);font-size:.875rem;cursor:pointer;">
+        <input type="checkbox" id="editTaskRecurring" style="accent-color:var(--sage);width:18px;height:18px;"> Weekly recurring
+      </label>
+    </div>
+    <div class="d-field"><label>Reminder</label><input class="inp" type="datetime-local" id="editTaskReminder"></div>
+    <p style="font-size:.82rem;color:var(--ink-faint);">Class and type cannot be changed after creation.</p>
+    <div class="d-actions">
+      <button class="btn btn-text" onclick="closeModal('editModal')">Cancel</button>
+      <button class="btn btn-filled" onclick="saveEditTask()">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Manage Class Modal ─────────────────────────────────────── -->
+<div class="overlay" id="manageClassModal">
+  <div class="dialog">
+    <span class="ms d-icon">folder</span>
+    <div class="d-head">Manage class</div>
+    <div class="d-body">Archiving keeps your data hidden but intact. Deleting removes it entirely.</div>
+    <div class="d-actions">
+      <button class="btn btn-text" onclick="closeModal('manageClassModal')">Cancel</button>
+      <button class="btn btn-warn btn-sm" onclick="archiveClass()">Archive term</button>
+      <button class="btn btn-err btn-sm" onclick="confirmDeleteClass()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let tasks=[], classes=[];
+  let expandedCardId=null, classIdToManage=null, taskToComplete=null, taskToEdit=null;
+  let showingArchive=false;
+
+  const TICONS={'Quiz':'quiz','Discussion':'forum','Lab':'science','Project':'design_services','Exam':'history_edu','Extra Credit':'stars'};
+
+  function flashSync(){const e=document.getElementById('syncIndicator');e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2000);}
+  async function saveTask(t){await window._saveTask(t);flashSync();}
+  async function saveClass(c){await window._saveClass(c);flashSync();}
+
+  function render(){renderTasks();renderArchive();renderByClass();refreshReminders();if(document.getElementById('tab-history').classList.contains('active'))renderHistory();}
+
+  function todayStr(){const t=new Date();return new Date(t.getTime()-t.getTimezoneOffset()*60000).toISOString().split('T')[0];}
+  function parseDate(s){const[y,m,d]=s.split('-');return new Date(+y,m-1,+d);}
+  function diffDays(s){const t=new Date();t.setHours(0,0,0,0);const d=parseDate(s);d.setHours(0,0,0,0);return Math.ceil((d-t)/86400000);}
+  function friendlyDate(s){if(!s)return'—';const d=diffDays(s);if(d<0)return`${Math.abs(d)}d overdue`;if(d===0)return'Today';if(d===1)return'Tomorrow';if(d<=6)return parseDate(s).toLocaleDateString('en-US',{weekday:'short'});return parseDate(s).toLocaleDateString('en-US',{month:'short',day:'numeric'});}
+  function fmtSec(s){const m=Math.floor(s/60);if(m<60)return m+'m';const h=Math.floor(m/60),r=m%60;return r?`${h}h ${r}m`:`${h}h`;}
+  function fmtMin(m){if(!m)return'—';if(m<60)return m+'m';const h=Math.floor(m/60),r=m%60;return r?`${h}h ${r}m`:`${h}h`;}
+
+  const TAB_IDS=['due','byclass','history','classes'];
+  function switchTab(name){
+    TAB_IDS.forEach(n=>{
+      const on=n===name;
+      document.querySelectorAll(`#nav-${n},#rail-${n}`).forEach(e=>e?.classList.toggle('active',on));
+      document.getElementById('tab-'+n).classList.toggle('active',on);
+    });
+    if(name==='history')renderHistory();
+    if(name==='classes')renderClassesTab();
+  }
+
+  function openAddModal(){populateClassDropdown();openModal('addModal');setTimeout(()=>document.getElementById('taskTitle').focus(),100);}
+
+  function toggleFormOptions(){
+    const opt=document.getElementById('formOptional'),btn=document.getElementById('formExpandBtn'),open=opt.classList.toggle('open');
+    btn.innerHTML=open?'<span class="ms">expand_less</span> Fewer options':'<span class="ms">expand_more</span> More options';
+  }
+
+  function checkFatigueWarning(){
+    const w=document.getElementById('fatigueWarning');
+    const cid=document.getElementById('taskClass').value,time=parseInt(document.getElementById('taskTime').value),date=document.getElementById('taskDate').value;
+    if(!cid||!time||!date){w.style.display='none';return;}
+    const cls=classes.find(c=>c.id===cid);if(!cls){w.style.display='none';return;}
+    const lim=cls.fatigueLimit||120;
+    const exist=tasks.filter(t=>!t.archived&&t.classId===cid&&t.date===date).reduce((s,t)=>s+(t.estimatedTime||0),0);
+    const total=exist+time;
+    if(total>=lim){w.innerHTML=`<strong>Fatigue risk:</strong> Adding this brings ${cls.name} to ${fmtMin(total)} on that day — above your ${fmtMin(lim)} limit. Consider splitting across days.`;w.style.display='block';}
+    else w.style.display='none';
+  }
+
+  async function addTask(){
+    const title=document.getElementById('taskTitle').value.trim(),date=document.getElementById('taskDate').value;
+    if(!title||!date){
+      if(!title)document.getElementById('taskTitle').style.borderColor='var(--brick)';
+      if(!date)document.getElementById('taskDate').style.borderColor='var(--brick)';
+      setTimeout(()=>{document.getElementById('taskTitle').style.borderColor='';document.getElementById('taskDate').style.borderColor='';},1500);
+      return;
+    }
+    const reminderAt=document.getElementById('taskReminder').value||null;
+    const nt={id:String(Date.now()),title,date,classId:document.getElementById('taskClass').value||null,type:document.getElementById('taskType').value||null,estimatedTime:parseInt(document.getElementById('taskTime').value)||null,timeSpent:0,isTimerRunning:false,lastTimerStart:null,recurring:document.getElementById('taskRecurring').checked,archived:false,subtasks:[],reminderAt,reminderDone:false};
+    maybeRequestNotifPermission(reminderAt);
+    tasks.push(nt);render();
+    ['taskTitle','taskDate','taskType','taskTime','taskClass','taskReminder'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('taskRecurring').checked=false;
+    document.getElementById('fatigueWarning').style.display='none';
+    document.getElementById('formOptional').classList.remove('open');
+    document.getElementById('formExpandBtn').innerHTML='<span class="ms">expand_more</span> More options';
+    closeModal('addModal');
+    await saveTask(nt);
+  }
+
+  function populateClassDropdown(){
+    const s=document.getElementById('taskClass'),v=s.value;
+    const active=classes.filter(c=>!c.archived);
+    if(!active.length){
+      // No classes set up yet — point the user to the Classes tab
+      s.innerHTML='<option value="">No classes yet — add them in the Classes tab</option>';
+      s.value='';return;
+    }
+    s.innerHTML='<option value="">No class</option>';
+    active.forEach(c=>s.innerHTML+=`<option value="${c.id}">${c.name}</option>`);
+    s.value=v;
+  }
+
+  function renderClassesTab(){
+    const list=document.getElementById('classList');list.innerHTML='';
+    const active=classes.filter(c=>!c.archived);
+    if(!active.length){list.innerHTML='<p class="empty">No classes yet. Add one above to start grouping your assignments.</p>';return;}
+    active.forEach(c=>{
+      const wrap=document.createElement('div');wrap.className='card-soft';
+      wrap.innerHTML=`
+        <div class="cls-row">
+          <div class="cls-color-dot" style="background:${c.color};"></div>
+          <div class="cls-info">
+            <div class="cls-name">${c.name}</div>
+            <div class="cls-meta">Fatigue limit: ${fmtMin(c.fatigueLimit)||'—'}</div>
+          </div>
+          <div class="cls-actions">
+            <button class="btn btn-text btn-sm" onclick="toggleEditClass('${c.id}',this)">Edit limit</button>
+            <button class="btn btn-err btn-sm" onclick="requestManageClass('${c.id}')">Remove</button>
+          </div>
+        </div>
+        <div class="cls-edit-row" id="cls-edit-${c.id}">
+          <div class="field" style="max-width:170px;margin-bottom:0;"><label>New fatigue limit (min)</label><input class="inp" id="cls-limit-${c.id}" type="number" value="${c.fatigueLimit||120}"></div>
+          <div style="display:flex;gap:.5rem;align-self:flex-end;">
+            <button class="btn btn-tonal btn-sm" onclick="saveClassLimit('${c.id}')">Save</button>
+            <button class="btn btn-text btn-sm" onclick="toggleEditClass('${c.id}')">Cancel</button>
+          </div>
+        </div>`;
+      list.appendChild(wrap);
+    });
+  }
+
+  function toggleEditClass(id,btn){const row=document.getElementById(`cls-edit-${id}`);const open=row.classList.toggle('open');if(btn)btn.textContent=open?'Cancel':'Edit limit';}
+  async function saveClassLimit(id){const cls=classes.find(c=>c.id===id);if(!cls)return;const v=parseInt(document.getElementById(`cls-limit-${id}`).value);if(!v||v<1)return;cls.fatigueLimit=v;await saveClass(cls);renderClassesTab();}
+
+  async function addClass(){
+    const nameEl=document.getElementById('className'), flEl=document.getElementById('classFatigue'), errEl=document.getElementById('classAddError');
+    const name=nameEl.value.trim();
+    const fl=parseInt(flEl.value);
+    // Validate: name and a real fatigue limit are both required
+    if(!name){
+      errEl.textContent='Enter a class name.';errEl.classList.add('show');
+      nameEl.style.borderColor='var(--brick)';setTimeout(()=>nameEl.style.borderColor='',1500);
+      nameEl.focus();return;
+    }
+    if(!fl||fl<1){
+      errEl.textContent='Set a fatigue limit (in minutes) — it drives the overload warnings.';errEl.classList.add('show');
+      flEl.style.borderColor='var(--brick)';setTimeout(()=>flEl.style.borderColor='',1500);
+      flEl.focus();return;
+    }
+    errEl.classList.remove('show');
+    const color=document.getElementById('classColor').value;
+    const nc={id:String(Date.now()),name,color,fatigueLimit:fl,archived:false};
+    classes.push(nc);populateClassDropdown();renderClassesTab();
+    // Clear form and refocus name so several classes can be entered in a row
+    nameEl.value='';flEl.value='';
+    nameEl.focus();
+    await saveClass(nc);
+  }
+
+  function requestManageClass(id){classIdToManage=id;openModal('manageClassModal');}
+  async function archiveClass(){
+    const c=classes.find(x=>x.id===classIdToManage);if(c){c.archived=true;await saveClass(c);}
+    for(const t of tasks.filter(t=>t.classId===classIdToManage)){t.archived=true;await saveTask(t);}
+    renderClassesTab();populateClassDropdown();render();closeModal('manageClassModal');
+  }
+  async function confirmDeleteClass(){
+    await window._deleteClass(classIdToManage);classes=classes.filter(x=>x.id!==classIdToManage);
+    for(const t of tasks.filter(t=>t.classId===classIdToManage)){t.classId=null;await saveTask(t);}
+    renderClassesTab();populateClassDropdown();render();closeModal('manageClassModal');
+  }
+
+  function absDate(s){ if(!s)return'—'; return parseDate(s).toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
+  function daysLeftInfo(s){
+    if(!s) return {txt:'—',key:'far'};
+    const d=diffDays(s);
+    if(d<0)   return {txt:`${Math.abs(d)}d overdue`, key:'overdue'};
+    if(d===0) return {txt:'Today',  key:'today'};
+    if(d===1) return {txt:'1 day',  key:'week'};
+    if(d<=7)  return {txt:`${d} days`, key:'week'};
+    return      {txt:`${d} days`, key:'far'};
+  }
+
+  // ── Reminders (in-app, fire while the app is open) ───────────
+  const _notified=new Set();   // task ids already shown as a browser notification this session
+
+  function fmtReminder(s){
+    if(!s) return '';
+    const d=new Date(s);
+    if(isNaN(d)) return '';
+    const time=d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    const dd=diffDays(s.split('T')[0]);
+    let day;
+    if(dd<0)       day=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    else if(dd===0)day='Today';
+    else if(dd===1)day='Tomorrow';
+    else if(dd<=6) day=d.toLocaleDateString('en-US',{weekday:'short'});
+    else           day=d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    return `${day} ${time}`;
+  }
+
+  function refreshReminders(){
+    const box=document.getElementById('reminderBanner');
+    if(!box) return;
+    const now=Date.now();
+    const due=tasks.filter(t=>!t.archived && t.reminderAt && !t.reminderDone && new Date(t.reminderAt).getTime()<=now);
+
+    // Optional browser notification (only if the user granted permission)
+    if('Notification' in window && Notification.permission==='granted'){
+      due.forEach(t=>{
+        if(!_notified.has(t.id)){
+          _notified.add(t.id);
+          try{ new Notification('Reminder: '+t.title,{body:'Due '+friendlyDate(t.date)}); }catch(e){}
+        }
+      });
+    }
+
+    if(!due.length){ box.className='reminder-banner'; box.innerHTML=''; return; }
+    box.className='reminder-banner show';
+    box.innerHTML=due.map(t=>`
+      <div class="reminder-row">
+        <span class="ms ms-bell">notifications_active</span>
+        <div class="reminder-text">
+          <strong>${t.title}</strong>
+          <span class="reminder-sub">Reminder • due ${friendlyDate(t.date)}</span>
+        </div>
+        <button class="reminder-dismiss" onclick="dismissReminder('${t.id}')" title="Dismiss"><span class="ms">close</span></button>
+      </div>`).join('');
+  }
+
+  async function dismissReminder(id){
+    const t=tasks.find(x=>x.id===id); if(!t) return;
+    t.reminderDone=true;
+    refreshReminders();
+    await saveTask(t);
+  }
+
+  // Ask for notification permission the first time a reminder is set
+  function maybeRequestNotifPermission(reminderAt){
+    if(reminderAt && 'Notification' in window && Notification.permission==='default'){
+      try{ Notification.requestPermission(); }catch(e){}
+    }
+  }
+
+  setInterval(refreshReminders, 30000);
+
+  function buildCard(task,isArchive=false){
+    const div=document.createElement('div');
+    div.className='task-card';div.dataset.id=task.id;
+    const cls=task.classId?classes.find(c=>c.id===task.classId):null;
+    const dot=cls?cls.color:'var(--line-mid)';
+
+    // Chips (class, type, recurring) — shown above the title in every state
+    let chips='';
+    if(cls)chips+=`<span class="chip" style="background:${cls.color}1f;color:${cls.color};border-color:${cls.color}44;">${cls.name}</span>`;
+    if(task.type)chips+=`<span class="chip"><span class="ms">${TICONS[task.type]||'task'}</span>${task.type}</span>`;
+    if(task.recurring)chips+=`<span class="chip chip-recur"><span class="ms">repeat</span>Weekly</span>`;
+    // Subtasks chip — appears once the first step is added; shows done/total
+    if(task.subtasks.length){
+      const doneCount=task.subtasks.filter(s=>s.done).length;
+      chips+=`<span class="chip"><span class="ms">checklist</span>${doneCount}/${task.subtasks.length}</span>`;
+    }
+    // Reminder chip — shows while a reminder is set and not yet dismissed
+    if(task.reminderAt && !task.reminderDone){
+      chips+=`<span class="chip"><span class="ms">notifications</span>${fmtReminder(task.reminderAt)}</span>`;
+    }
+
+    // Meta: days-left chip (active cards only) to the left of the due-date chip
+    let metaHTML;
+    if(isArchive){
+      metaHTML=`<span class="due-chip">${absDate(task.date)}</span>`;
+    } else {
+      const dl=daysLeftInfo(task.date);
+      metaHTML=`<span class="days-chip d-${dl.key}">${dl.txt}</span><span class="due-chip">${absDate(task.date)}</span>`;
+    }
+
+    const top=document.createElement('div');top.className='card-top';
+    top.innerHTML=`
+      ${chips?`<div class="card-chip-row">${chips}</div>`:''}
+      <div class="card-headline">
+        <div class="c-dot" style="background:${dot};"></div>
+        <div class="c-title">${task.title}</div>
+        <div class="c-meta">${metaHTML}</div>
+      </div>`;
+    if(!isArchive)top.onclick=()=>toggleCard(task.id,div);
+    div.appendChild(top);
+
+    const body=document.createElement('div');body.className='card-body';
+
+    // Timer button — sits where the chips used to live, above the time row
+    const timerCls=task.isTimerRunning?'btn-err':'btn-outlined';
+    const timerIco=task.isTimerRunning?'pause':'play_arrow';
+    const timerTxt=task.isTimerRunning?'Stop':'Timer';
+    const timerRow=isArchive?'':`<div class="timer-row"><button class="btn ${timerCls} btn-sm" onclick="toggleTimer('${task.id}')"><span class="ms">${timerIco}</span>${timerTxt}</button></div>`;
+
+    const sp=task.timeSpent||0;
+    const timeRow=`<div class="time-row"><div class="time-card"><div class="t-label">Estimated</div><div class="t-val">${task.estimatedTime?fmtMin(task.estimatedTime):'—'}</div></div><div class="time-card"><div class="t-label">Actual</div><div class="t-val ${task.isTimerRunning?'running':''}" id="timer-display-${task.id}">${sp>0||task.isTimerRunning?fmtSec(sp):'—'}</div></div></div>`;
+
+    const subHTML=task.subtasks.map(st=>`<div class="sub-item"><input type="checkbox" ${st.done?'checked':''} onchange="toggleSubtask('${task.id}','${st.id}')" ${isArchive?'disabled':''}><span class="sub-text ${st.done?'sub-done':''}">${st.text}</span></div>`).join('');
+    const subInput=isArchive?'':`<div class="sub-add"><input class="inp" id="subtask-input-${task.id}" placeholder="Add a step…" style="font-size:.875rem;" onkeydown="if(event.key==='Enter')addSubtask('${task.id}')"><button class="btn btn-tonal btn-sm" onclick="addSubtask('${task.id}')">Add</button></div>`;
+    const subBlock=(task.subtasks.length||!isArchive)?`<div class="sub-list">${subHTML}${subInput}</div>`:'';
+
+    // Edit + Done, right-aligned (timer no longer lives here)
+    const actions=isArchive?'':`<hr class="divider"><div class="card-actions card-actions-right"><button class="btn btn-outlined btn-sm" onclick="openEditModal('${task.id}')"><span class="ms">edit</span>Edit</button><button class="btn btn-good btn-sm" onclick="openCompletionModal('${task.id}')"><span class="ms">check</span>Done</button></div>`;
+
+    body.innerHTML=`${timerRow}${timeRow}${subBlock}${actions}`;
+    div.appendChild(body);return div;
+  }
+
+  function toggleCard(taskId,el){
+    if(expandedCardId&&expandedCardId!==taskId){const p=document.querySelector(`[data-id="${expandedCardId}"]`);if(p)p.classList.remove('expanded');}
+    expandedCardId=el.classList.toggle('expanded')?taskId:null;
+  }
+
+  function renderTasks(){
+    const l=document.getElementById('taskList');l.innerHTML='';
+    const active=tasks.filter(t=>!t.archived).sort((a,b)=>new Date(a.date)-new Date(b.date));
+    if(!active.length){l.innerHTML='<p class="empty">Nothing due right now. Tap <strong>Add</strong> to create your first assignment.</p>';return;}
+    active.forEach(t=>l.appendChild(buildCard(t)));
+    if(expandedCardId){const el=document.querySelector(`[data-id="${expandedCardId}"]`);if(el)el.classList.add('expanded');}
+  }
+
+  function toggleArchive(){showingArchive=!showingArchive;document.getElementById('archiveList').style.display=showingArchive?'block':'none';}
+  function renderArchive(){const l=document.getElementById('archiveList');l.innerHTML='';tasks.filter(t=>t.archived).sort((a,b)=>new Date(b.date)-new Date(a.date)).forEach(t=>l.appendChild(buildCard(t,true)));}
+
+  function renderByClass(){
+    const l=document.getElementById('byClassList');l.innerHTML='';
+    const active=tasks.filter(t=>!t.archived).sort((a,b)=>new Date(a.date)-new Date(b.date));
+    const g={};active.forEach(t=>{const k=t.classId||'__none__';if(!g[k])g[k]=[];g[k].push(t);});
+    const ord=classes.filter(c=>!c.archived);
+    if(g['__none__'])ord.push({id:'__none__',name:'Unassigned',color:'var(--line-mid)'});
+    ord.forEach(cls=>{
+      const items=g[cls.id];if(!items?.length)return;
+      const grp=document.createElement('div');grp.className='cls-group';
+      grp.innerHTML=`<div class="cls-group-hdr"><div class="cls-group-dot" style="background:${cls.color};"></div><span class="cls-group-name">${cls.name}</span><span class="cls-group-count">${items.length} assignment${items.length!==1?'s':''}</span></div>`;
+      items.forEach(t=>grp.appendChild(buildCard(t)));l.appendChild(grp);
+    });
+    if(!l.innerHTML)l.innerHTML='<p class="empty">No active assignments.</p>';
+  }
+
+  // ── Cognitive load model ─────────────────────────────────────
+  // Rolling average of daily workload vs. capacity over the week AHEAD
+  // (today + next 6 days), so scheduling upcoming work moves the gauge.
+  // Capacity = sum of class fatigue limits. Load per day = actual minutes
+  // logged where available, otherwise the estimate, for tasks tied to an
+  // active class. Time is attributed to a task's due date.
+  function fatigueWindowDays(){
+    const days=[];
+    for(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()+i);days.push(d.toISOString().split('T')[0]);}
+    return days;
+  }
+  function taskMinutes(t){ return t.timeSpent>0 ? Math.round(t.timeSpent/60) : (t.estimatedTime||0); }
+
+  function computeFatigue(){
+    const active=classes.filter(c=>!c.archived);
+    if(!active.length) return null;
+    const ids=new Set(active.map(c=>c.id));
+    const totalCap=active.reduce((s,c)=>s+(c.fatigueLimit||0),0);
+    const days=fatigueWindowDays();
+
+    function dayLoad(dstr,classId){
+      return tasks
+        .filter(t=>!t.archived && t.date===dstr && t.classId && ids.has(t.classId) && (classId?t.classId===classId:true))
+        .reduce((s,t)=>s+taskMinutes(t),0);
+    }
+
+    const combinedRatios=days.map(d=> totalCap>0 ? dayLoad(d)/totalCap : 0);
+    const rolling=combinedRatios.reduce((a,b)=>a+b,0)/combinedRatios.length;
+
+    const perClass=active.map(c=>{
+      const cap=c.fatigueLimit||0;
+      const ratios=days.map(d=> cap>0 ? dayLoad(d,c.id)/cap : 0);
+      const avg=ratios.reduce((a,b)=>a+b,0)/ratios.length;
+      return {name:c.name,color:c.color,ratio:avg};
+    }).sort((a,b)=>b.ratio-a.ratio);
+
+    return {rolling,perClass};
+  }
+
+  function loadZone(r){
+    if(r<0.5)  return {label:'Light',      key:'light'};
+    if(r<0.85) return {label:'Balanced',   key:'balanced'};
+    if(r<=1.10)return {label:'Heavy',      key:'heavy'};
+    return       {label:'Overloaded', key:'over'};
+  }
+  const ZONE_COLOR={light:'var(--sage)',balanced:'var(--sage-deep)',heavy:'var(--amber)',over:'var(--brick)'};
+
+  // Brain SVG with a liquid fill that rises with load. fillPct 0..1+.
+  function buildBrainSVG(fillPct,zoneKey){
+    const pct=Math.max(0,Math.min(1,fillPct));      // clamp visual fill 0..1
+    const fillColor=ZONE_COLOR[zoneKey];
+    const top=100-pct*100;                            // y of liquid surface in viewBox units
+    const brain="M50 16 C40 9,27 11,23 21 C14 21,10 30,15 38 C8 45,11 55,20 59 C17 69,26 78,37 75 C41 84,53 84,59 77 C70 81,80 72,77 61 C85 57,85 45,78 41 C83 32,76 23,66 24 C62 13,52 10,50 16 Z";
+    const wave=`M0 ${top} q 12 -4 25 0 t 25 0 t 25 0 t 25 0 V100 H0 Z`;
+    return `
+      <svg viewBox="0 0 100 100" class="${zoneKey==='over'?'':'brain-bob'}" aria-hidden="true">
+        <defs>
+          <clipPath id="brainClip"><path d="${brain}"/></clipPath>
+        </defs>
+        <path d="${brain}" fill="var(--inset)"/>
+        <g clip-path="url(#brainClip)">
+          <rect x="0" y="${top}" width="100" height="${100-top}" fill="${fillColor}" opacity="0.85" style="transition:y .6s ease,height .6s ease"/>
+          <path d="${wave}" fill="${fillColor}" opacity="0.45"/>
+          <circle cx="34" cy="${Math.min(96,top+14)}" r="2.4" fill="#fff" opacity="0.35"/>
+          <circle cx="60" cy="${Math.min(96,top+22)}" r="1.7" fill="#fff" opacity="0.3"/>
+        </g>
+        <path d="${brain}" fill="none" stroke="var(--ink-soft)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M50 18 C46 30,54 42,49 54 C45 63,52 70,50 76" fill="none" stroke="var(--ink-soft)" stroke-width="1.4" opacity="0.55" stroke-linecap="round"/>
+        <path d="M32 30 q 8 4 4 12" fill="none" stroke="var(--ink-soft)" stroke-width="1.2" opacity="0.4" stroke-linecap="round"/>
+        <path d="M66 34 q -8 4 -3 12" fill="none" stroke="var(--ink-soft)" stroke-width="1.2" opacity="0.4" stroke-linecap="round"/>
+      </svg>`;
+  }
+
+  function renderFatigue(){
+    const wrap=document.getElementById('brainWrap');
+    const zoneEl=document.getElementById('loadZone');
+    const subEl=document.getElementById('loadSub');
+    const pcEl=document.getElementById('perClassBreakdown');
+    const data=computeFatigue();
+
+    if(!data){
+      wrap.innerHTML=buildBrainSVG(0,'light');
+      zoneEl.textContent='—';zoneEl.className='load-zone';
+      subEl.textContent='Add classes with fatigue limits to start tracking your cognitive load.';
+      pcEl.innerHTML='';
+      return;
+    }
+
+    const z=loadZone(data.rolling);
+    wrap.innerHTML=buildBrainSVG(data.rolling,z.key);
+    zoneEl.textContent=z.label;
+    zoneEl.className='load-zone z-'+z.key;
+    const pctTxt=Math.round(data.rolling*100);
+    subEl.textContent=`Your typical day runs at about ${pctTxt}% of your fatigue capacity, averaged across the next 7 days.`;
+
+    pcEl.innerHTML='';
+    data.perClass.forEach(c=>{
+      const z2=loadZone(c.ratio);
+      const w=Math.max(2,Math.min(100,c.ratio*100));
+      const row=document.createElement('div');row.className='pc-row';
+      row.innerHTML=`
+        <span class="pc-name">${c.name}</span>
+        <span class="pc-track"><span class="pc-fill" style="width:${w}%;background:${ZONE_COLOR[z2.key]};"></span></span>
+        <span class="pc-tag z-${z2.key}">${z2.label}</span>`;
+      pcEl.appendChild(row);
+    });
+  }
+
+  // ── Observations: plain-language patterns from the data ──────
+  function renderObservations(){
+    const box=document.getElementById('observations');
+    const obs=[];
+
+    const done=tasks.filter(t=>t.estimatedTime>0 && t.timeSpent>0);
+    if(done.length>=2){
+      const byType={};
+      done.forEach(t=>{const k=t.type||'Untyped';if(!byType[k])byType[k]={est:0,act:0,n:0};byType[k].est+=t.estimatedTime;byType[k].act+=Math.round(t.timeSpent/60);byType[k].n++;});
+      let worst=null;
+      Object.entries(byType).forEach(([type,v])=>{
+        if(v.n<2||v.est===0)return;
+        const dev=(v.act-v.est)/v.est;
+        if(!worst||Math.abs(dev)>Math.abs(worst.dev))worst={type,dev,n:v.n};
+      });
+      if(worst&&Math.abs(worst.dev)>=0.15){
+        const pct=Math.round(Math.abs(worst.dev)*100);
+        if(worst.dev>0) obs.push({icon:'trending_up',text:`You tend to <strong>underestimate ${worst.type}s</strong> — they take about ${pct}% longer than you plan. Consider padding those estimates.`});
+        else            obs.push({icon:'trending_down',text:`You tend to <strong>overestimate ${worst.type}s</strong> — they take about ${pct}% less time than you plan. You may have more room than you think.`});
+      }
+    }
+
+    const next7={};
+    for(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()+i);const s=d.toISOString().split('T')[0];next7[s]=0;}
+    tasks.filter(t=>!t.archived).forEach(t=>{if(next7[t.date]!==undefined)next7[t.date]+=(t.estimatedTime||0);});
+    const heavy=Object.entries(next7).sort((a,b)=>b[1]-a[1])[0];
+    if(heavy&&heavy[1]>0){
+      const d=parseDate(heavy[0]);
+      const dayName=diffDays(heavy[0])===0?'today':diffDays(heavy[0])===1?'tomorrow':d.toLocaleDateString('en-US',{weekday:'long'});
+      obs.push({icon:'event',text:`Your heaviest day ahead is <strong>${dayName}</strong> with ${fmtMin(heavy[1])} of planned work.`});
+    }
+
+    const fd=computeFatigue();
+    if(fd){
+      const z=loadZone(fd.rolling);
+      if(z.key==='over') obs.push({icon:'priority_high',text:`Your overall load has been <strong>over capacity</strong> this week. Look at spreading work earlier or trimming where you can.`});
+      else if(z.key==='light') obs.push({icon:'spa',text:`You've had a <strong>light week</strong> — a good window to get ahead on anything upcoming.`});
+    }
+
+    if(!obs.length){
+      box.innerHTML='<p class="empty">Log time on a few assignments and complete them, and patterns will start showing up here.</p>';
+      return;
+    }
+    box.innerHTML=obs.map(o=>`<div class="obs-item"><span class="ms">${o.icon}</span><span>${o.text}</span></div>`).join('');
+  }
+
+  function renderHistory(){
+    renderFatigue();
+    renderObservations();
+    const cb=document.getElementById('chartBars'),cl=document.getElementById('chartLabels');cb.innerHTML='';cl.innerHTML='';
+    const days=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push({str:d.toISOString().split('T')[0],label:d.toLocaleDateString('en-US',{weekday:'short'}).slice(0,2)});}
+    let max=1;days.forEach(({str})=>{const dt=tasks.filter(t=>t.date===str);max=Math.max(max,dt.reduce((s,t)=>s+(t.estimatedTime||0),0),dt.reduce((s,t)=>s+Math.round((t.timeSpent||0)/60),0));});
+    days.forEach(({str,label})=>{
+      const dt=tasks.filter(t=>t.date===str);
+      const est=dt.reduce((s,t)=>s+(t.estimatedTime||0),0),act=dt.reduce((s,t)=>s+Math.round((t.timeSpent||0)/60),0);
+      const col=document.createElement('div');col.className='chart-col';
+      col.innerHTML=`<div class="bar-group"><div class="bar bar-e" style="height:${Math.round((est/max)*88)}px;" title="${est}m est."></div><div class="bar bar-a" style="height:${Math.round((act/max)*88)}px;" title="${act}m actual"></div></div>`;
+      cb.appendChild(col);
+      const lbl=document.createElement('div');lbl.className='chart-col';lbl.innerHTML=`<span class="day-lbl">${label}</span>`;cl.appendChild(lbl);
+    });
+    const ws=new Date();ws.setDate(ws.getDate()-ws.getDay());ws.setHours(0,0,0,0);const we=new Date(ws);we.setDate(we.getDate()+7);
+    const wt=tasks.filter(t=>{if(!t.date)return false;const d=parseDate(t.date);return d>=ws&&d<we&&(t.timeSpent>0||t.estimatedTime);});
+    const byType={};wt.forEach(t=>{const k=t.type||'Untyped';if(!byType[k])byType[k]={est:0,act:0};byType[k].est+=t.estimatedTime||0;byType[k].act+=Math.round((t.timeSpent||0)/60);});
+    const tb=document.getElementById('typeTableBody');tb.innerHTML='';
+    const types=Object.keys(byType);
+    if(!types.length){tb.innerHTML='<tr><td colspan="4" class="empty">No data yet. Complete assignments with time logged to see trends.</td></tr>';return;}
+    types.forEach(type=>{const{est,act}=byType[type],diff=act-est,ds=diff===0?'0m':(diff>0?'+':'')+diff+'m',dc=diff>5?'over':(diff<=0&&act>0?'match':'');tb.innerHTML+=`<tr><td>${type}</td><td>${fmtMin(est)}</td><td>${act>0?act+'m':'—'}</td><td class="${dc}">${act>0?ds:'—'}</td></tr>`;});
+  }
+
+  async function toggleTimer(taskId){
+    const task=tasks.find(t=>t.id===taskId);if(!task)return;
+    const now=Date.now();
+    if(task.isTimerRunning){task.timeSpent+=Math.floor((now-task.lastTimerStart)/1000);task.isTimerRunning=false;task.lastTimerStart=null;}
+    else{task.isTimerRunning=true;task.lastTimerStart=now;}
+    render();await saveTask(task);
+  }
+  function updateRunningTimers(){
+    const now=Date.now();
+    tasks.forEach(task=>{
+      if(!task.isTimerRunning||task.archived)return;
+      const el=document.getElementById(`timer-display-${task.id}`);if(!el)return;
+      el.textContent=fmtSec((task.timeSpent||0)+Math.floor((now-task.lastTimerStart)/1000));el.classList.add('running');
+    });
+  }
+  setInterval(updateRunningTimers,1000);
+
+  async function addSubtask(taskId){
+    const inp=document.getElementById(`subtask-input-${taskId}`),text=inp.value.trim();if(!text)return;
+    const task=tasks.find(t=>t.id===taskId);if(!task)return;
+    task.subtasks.push({id:String(Date.now()),text,done:false});inp.value='';render();await saveTask(task);
+  }
+  async function toggleSubtask(taskId,stId){
+    const task=tasks.find(t=>t.id===taskId);if(!task)return;
+    const st=task.subtasks.find(s=>s.id===stId);if(!st)return;
+    st.done=!st.done;render();await saveTask(task);
+  }
+
+  function openCompletionModal(taskId){
+    taskToComplete=tasks.find(t=>t.id===taskId);if(!taskToComplete)return;
+    if(taskToComplete.isTimerRunning){const now=Date.now();taskToComplete.timeSpent+=Math.floor((now-taskToComplete.lastTimerStart)/1000);taskToComplete.isTimerRunning=false;taskToComplete.lastTimerStart=null;}
+    document.getElementById('completionTaskTitle').textContent=taskToComplete.title;
+    document.getElementById('completionTimeInput').value=Math.floor((taskToComplete.timeSpent||0)/60);
+    const sd=document.getElementById('completionSubtasksList');
+    sd.innerHTML=taskToComplete.subtasks.length?taskToComplete.subtasks.map(st=>`<label style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;font-size:.875rem;cursor:pointer;"><input type="checkbox" id="comp-sub-${st.id}" ${st.done?'checked':''} style="accent-color:var(--sage);width:18px;height:18px;">${st.text}</label>`).join(''):'<span style="font-size:.875rem;color:var(--ink-faint);">No subtasks recorded.</span>';
+    openModal('completionModal');
+  }
+  async function confirmCompletion(){
+    if(!taskToComplete)return;
+    const mins=parseInt(document.getElementById('completionTimeInput').value)||0;
+    taskToComplete.timeSpent=mins*60;
+    taskToComplete.subtasks.forEach(st=>{const cb=document.getElementById(`comp-sub-${st.id}`);if(cb)st.done=cb.checked;});
+    if(taskToComplete.recurring){
+      const d=parseDate(taskToComplete.date);d.setDate(d.getDate()+7);
+      const nt={id:String(Date.now()),title:taskToComplete.title,date:d.toISOString().split('T')[0],classId:taskToComplete.classId,recurring:true,archived:false,type:taskToComplete.type,estimatedTime:taskToComplete.estimatedTime,timeSpent:0,isTimerRunning:false,lastTimerStart:null,subtasks:taskToComplete.subtasks.map(st=>({id:String(Date.now()+Math.random()),text:st.text,done:false}))};
+      tasks.push(nt);await saveTask(nt);
+    }
+    taskToComplete.archived=true;await saveTask(taskToComplete);closeModal('completionModal');
+  }
+
+  function openEditModal(taskId){
+    taskToEdit=tasks.find(t=>t.id===taskId);if(!taskToEdit)return;
+    document.getElementById('editTaskTitle').value=taskToEdit.title||'';
+    document.getElementById('editTaskDate').value=taskToEdit.date||'';
+    document.getElementById('editTaskTime').value=taskToEdit.estimatedTime||'';
+    document.getElementById('editTaskRecurring').checked=!!taskToEdit.recurring;
+    document.getElementById('editTaskReminder').value=taskToEdit.reminderAt||'';
+    openModal('editModal');
+  }
+  async function saveEditTask(){
+    if(!taskToEdit)return;
+    const title=document.getElementById('editTaskTitle').value.trim(),date=document.getElementById('editTaskDate').value;
+    if(!title||!date)return;
+    taskToEdit.title=title;taskToEdit.date=date;
+    taskToEdit.estimatedTime=parseInt(document.getElementById('editTaskTime').value)||null;
+    taskToEdit.recurring=document.getElementById('editTaskRecurring').checked;
+    const newReminder=document.getElementById('editTaskReminder').value||null;
+    if(newReminder!==taskToEdit.reminderAt){
+      // Reminder time changed — re-arm it so it can fire again
+      taskToEdit.reminderAt=newReminder;
+      taskToEdit.reminderDone=false;
+      _notified.delete(taskToEdit.id);
+      maybeRequestNotifPermission(newReminder);
+    }
+    render();await saveTask(taskToEdit);closeModal('editModal');
+  }
+
+  function openModal(id){document.getElementById(id).classList.add('open');}
+  function closeModal(id){document.getElementById(id).classList.remove('open');taskToComplete=null;taskToEdit=null;}
+  document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+  new Sortable(document.getElementById('taskList'),{
+    animation:150,ghostClass:'sortable-ghost',
+    async onEnd(){
+      const ids=Array.from(document.getElementById('taskList').children).map(c=>c.dataset.id).filter(Boolean);
+      const active=tasks.filter(t=>!t.archived),archived=tasks.filter(t=>t.archived);
+      tasks=[...ids.map(id=>active.find(t=>t.id===id)).filter(Boolean),...archived];
+      await window._saveAllTasks(tasks);flashSync();
+    }
+  });
+
+  function exportData(){const b=new Blob([JSON.stringify({tasks,classes},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`school_tracker_${todayStr()}.json`;a.click();URL.revokeObjectURL(a.href);}
+  async function importData(e){
+    const file=e.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=async ev=>{try{const data=JSON.parse(ev.target.result);if(data.tasks&&data.classes){await window._importAll(data.tasks,data.classes);flashSync();}}catch{alert('Import failed — the file may be corrupted.');}};
+    reader.readAsText(file);e.target.value='';
+  }
+</script>
+</body>
+</html>        document.getElementById('appShell').style.display   = 'block';
+        document.getElementById('userEmail').textContent    = user.email;
+        unsubC = onSnapshot(collection(db,'users',user.uid,'classes'), s => {
+          classes = s.docs.map(d=>({id:d.id,...d.data()}));
+          populateClassDropdown(); renderClassesTab(); render();
+          // On the very first load, if no classes exist yet, start the user
+          // in the Classes tab so up-front setup comes first.
+          if(!_initialRouteDone){
+            _initialRouteDone = true;
+            if(classes.filter(c=>!c.archived).length === 0){
+              switchTab('classes');
+            }
+          }
+        });
+        unsubT = onSnapshot(collection(db,'users',user.uid,'tasks'), s => {
+          tasks = s.docs.map(d=>({id:d.id,...d.data()}));
+          render();
+        });
+      } else {
+        if(unsubT) unsubT(); if(unsubC) unsubC();
+        tasks=[]; classes=[];
+        _initialRouteDone = false;
+        document.getElementById('authScreen').style.display = 'flex';
+        document.getElementById('appShell').style.display   = 'none';
+      }
+    });
+
+    const uid = () => auth.currentUser.uid;
+    window._saveTask    = async t  => { const{id,...d}=t; await setDoc(doc(db,'users',uid(),'tasks',String(id)),d); };
+    window._saveClass   = async c  => { const{id,...d}=c; await setDoc(doc(db,'users',uid(),'classes',String(id)),d); };
+    window._deleteClass = async id => { await deleteDoc(doc(db,'users',uid(),'classes',String(id))); };
+    window._saveAllTasks = async list => {
+      const b=writeBatch(db);
+      list.forEach(t=>{ const{id,...d}=t; b.set(doc(db,'users',uid(),'tasks',String(id)),d); });
+      await b.commit();
+    };
+    window._importAll = async (ts,cs) => {
+      const b=writeBatch(db);
+      ts.forEach(t=>{ const{id,...d}=t; b.set(doc(db,'users',uid(),'tasks',String(id)),d); });
+      cs.forEach(c=>{ const{id,...d}=c; b.set(doc(db,'users',uid(),'classes',String(id)),d); });
+      await b.commit();
+    };
+  </script>
+
+  <style>
+    /* ── Soft Card Palette (light only) ──────────────────────── */
+    :root {
+      --paper:    #F3F5F1;   /* app background — soft warm-cool paper */
+      --surface:  #FFFFFF;   /* floating cards */
+      --inset:    #F0F2EE;   /* recessed fills (time cards, chips) */
+      --inset-2:  #FBFCFA;   /* input fills */
+      --ink:      #2B312E;   /* primary text */
+      --ink-soft: #6A716D;   /* secondary text */
+      --ink-faint:#9AA09B;   /* tertiary text */
+      --line:     #E5E8E3;   /* hairline borders */
+      --line-mid: #D3D7D1;   /* slightly stronger border */
+
+      --sage:     #5C8A7D;   /* primary accent */
+      --on-sage:  #FFFFFF;
+      --sage-tint:#E7F0EB;   /* accent container */
+      --on-sage-tint:#2F5249;
+      --sage-deep:#3F6B5E;   /* deeper accent for data */
+
+      --neutral-tint:#EBEEE9; /* active nav indicator */
+
+      --amber:    #B07A33;   /* due today */
+      --amber-tint:#F6EBD6;
+      --brick:    #C25B54;   /* overdue / destructive */
+      --brick-tint:#F6E2E0;
+
+      --shadow-sm:0 1px 2px rgba(43,49,46,.04),0 1px 3px rgba(43,49,46,.05);
+      --shadow-md:0 2px 8px rgba(43,49,46,.06),0 1px 3px rgba(43,49,46,.05);
+      --shadow-lg:0 12px 32px rgba(43,49,46,.13),0 3px 8px rgba(43,49,46,.06);
+
+      --r-xs:6px; --r-s:10px; --r-m:14px; --r-l:18px; --r-xl:24px; --r-f:999px;
+
+      --display:'Fraunces', Georgia, serif;
+      --body:'Hanken Grotesk', system-ui, sans-serif;
+    }
+
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:var(--body);background:var(--paper);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+    /* ── Auth ───────────────────────────────────────────────── */
+    #authScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;}
+    .auth-card{background:var(--surface);border-radius:var(--r-xl);padding:2.75rem 2.25rem;max-width:360px;width:100%;text-align:center;box-shadow:var(--shadow-md);border:1px solid var(--line);}
+    .auth-icon{font-size:44px;color:var(--sage);margin-bottom:1rem;display:block;}
+    .auth-card h1{font-family:var(--display);font-size:1.7rem;font-weight:500;color:var(--ink);margin-bottom:.5rem;letter-spacing:-.01em;}
+    .auth-card p{font-size:.9rem;color:var(--ink-soft);line-height:1.55;margin-bottom:1.75rem;}
+
+    /* ── Buttons ─────────────────────────────────────────────── */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;border:none;border-radius:var(--r-f);cursor:pointer;font-family:var(--body);font-size:.875rem;font-weight:500;padding:.6rem 1.35rem;height:42px;position:relative;overflow:hidden;white-space:nowrap;transition:transform .12s ease,box-shadow .2s,background .2s;}
+    .btn::after{content:'';position:absolute;inset:0;background:currentColor;opacity:0;transition:opacity .2s;border-radius:inherit;}
+    .btn:hover::after{opacity:.06;} .btn:active{transform:translateY(1px);}
+    .btn-filled{background:var(--sage);color:var(--on-sage);box-shadow:var(--shadow-sm);}
+    .btn-filled:hover{box-shadow:var(--shadow-md);}
+    .btn-tonal{background:var(--sage-tint);color:var(--on-sage-tint);}
+    .btn-outlined{background:var(--surface);color:var(--ink);border:1px solid var(--line-mid);}
+    .btn-text{background:transparent;color:var(--sage);padding:.6rem .8rem;}
+    .btn-err{background:var(--brick-tint);color:var(--brick);}
+    .btn-good{background:var(--sage-tint);color:var(--on-sage-tint);}
+    .btn-warn{background:var(--amber-tint);color:var(--amber);}
+    .btn-sm{height:34px;font-size:.8rem;padding:.35rem 1rem;}
+
+    /* ── Top Bar ─────────────────────────────────────────────── */
+    .top-bar{display:flex;align-items:center;gap:.6rem;padding:0 1.1rem;height:66px;background:var(--paper);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line);}
+    .top-bar-title{font-family:var(--display);font-size:1.35rem;font-weight:500;color:var(--ink);flex:1;letter-spacing:-.01em;}
+    .top-bar-actions{display:flex;align-items:center;gap:.4rem;}
+    #userEmail{font-size:.78rem;color:var(--ink-faint);}
+    .sync{font-size:.72rem;color:var(--sage);opacity:0;transition:opacity .3s;}
+    .sync.on{opacity:1;}
+    @media(max-width:599px){#userEmail{display:none;}}
+
+    /* ── Nav Rail (desktop) ──────────────────────────────────── */
+    .nav-rail{display:none;flex-direction:column;align-items:center;width:84px;background:var(--paper);position:fixed;top:66px;bottom:0;left:0;z-index:10;padding:1.25rem 0;}
+    @media(min-width:600px){.nav-rail{display:flex;}}
+
+    .rail-add{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:none;cursor:pointer;padding:0;width:100%;margin-bottom:1rem;}
+    .rail-add-pill{display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:var(--r-l);background:var(--sage);color:var(--on-sage);box-shadow:var(--shadow-md);transition:transform .12s,box-shadow .2s;}
+    .rail-add:hover .rail-add-pill{box-shadow:var(--shadow-lg);transform:translateY(-1px);}
+    .rail-add:active .rail-add-pill{transform:translateY(0);}
+    .rail-add-label{font-size:.75rem;font-weight:500;color:var(--ink-soft);}
+
+    .rail-divider{width:36px;height:1px;background:var(--line);margin-bottom:1rem;flex-shrink:0;}
+
+    .rail-item{display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:none;cursor:pointer;padding:0;width:100%;color:var(--ink-soft);font-family:var(--body);font-size:.72rem;font-weight:500;margin-bottom:.4rem;}
+    .rail-item.active{color:var(--ink);}
+    .rail-ind{display:flex;align-items:center;justify-content:center;width:54px;height:32px;border-radius:var(--r-f);background:transparent;transition:background .2s;}
+    .rail-item.active .rail-ind{background:var(--neutral-tint);}
+
+    /* ── Nav Bar (mobile) ────────────────────────────────────── */
+    .nav-bar{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);z-index:20;padding-bottom:env(safe-area-inset-bottom,0);border-top:1px solid var(--line);}
+    @media(max-width:599px){.nav-bar{display:block;}}
+    .nav-bar-inner{display:flex;height:78px;align-items:flex-start;padding-top:12px;}
+    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;padding:0 2px;color:var(--ink-soft);font-family:var(--body);font-size:.7rem;font-weight:500;}
+    .nav-item.active{color:var(--ink);}
+    .nav-ind{display:flex;align-items:center;justify-content:center;width:60px;height:30px;border-radius:var(--r-f);background:transparent;transition:background .2s;}
+    .nav-item.active .nav-ind{background:var(--neutral-tint);}
+    .nav-item-add .nav-ind{background:var(--sage);color:var(--on-sage);}
+    .nav-item-add{color:var(--ink-soft);}
+
+    /* ── App Layout ──────────────────────────────────────────── */
+    #appShell{display:none;}
+    .app-body{padding-bottom:96px;}
+    @media(min-width:600px){.app-body{margin-left:84px;padding-bottom:2rem;}}
+    .main{max-width:640px;margin:0 auto;padding:1.5rem 1.1rem;}
+    .tab-panel{display:none;} .tab-panel.active{display:block;}
+
+    .page-eyebrow{font-family:var(--display);font-size:1.4rem;font-weight:500;color:var(--ink);margin-bottom:1.1rem;letter-spacing:-.01em;}
+
+    /* ── Task Cards ──────────────────────────────────────────── */
+    .task-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);margin-bottom:.65rem;overflow:hidden;cursor:pointer;box-shadow:var(--shadow-sm);transition:box-shadow .2s;}
+    .task-card:hover{box-shadow:var(--shadow-md);}
+    .task-card.expanded{box-shadow:var(--shadow-md);}
+
+    .card-top{padding:.9rem 1.1rem;}
+    .card-chip-row{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.6rem;}
+    .card-headline{display:flex;align-items:center;gap:.7rem;min-height:26px;}
+    .c-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+    .c-title{font-size:.95rem;font-weight:500;flex:1;line-height:1.35;color:var(--ink);}
+    .c-meta{display:flex;align-items:center;gap:.4rem;flex-shrink:0;}
+    .due-chip{font-size:.74rem;font-weight:500;color:var(--ink-soft);background:var(--inset);padding:.22rem .6rem;border-radius:var(--r-f);}
+    .days-chip{font-size:.74rem;font-weight:600;padding:.22rem .6rem;border-radius:var(--r-f);white-space:nowrap;}
+    .days-chip.d-overdue{background:var(--brick-tint);color:var(--brick);}
+    .days-chip.d-today{background:var(--amber-tint);color:var(--amber);}
+    .days-chip.d-week{background:#F2E8CE;color:#8A6A24;}
+    .days-chip.d-far{background:var(--inset);color:var(--ink-soft);}
+
+    .card-body{display:none;border-top:1px solid var(--line);padding:1.1rem;}
+    .task-card.expanded .card-body{display:block;}
+    .timer-row{margin-bottom:1rem;}
+    .card-actions-right{justify-content:flex-end;}
+
     .chip-row{display:flex;gap:.45rem;flex-wrap:wrap;margin-bottom:1rem;}
     .chip{display:inline-flex;align-items:center;gap:.3rem;font-size:.8rem;font-weight:500;padding:.28rem .7rem;border-radius:var(--r-f);border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);}
     .chip .ms{font-size:14px;}
