@@ -43,15 +43,15 @@
         document.getElementById('authScreen').style.display = 'none';
         document.getElementById('appShell').style.display   = 'block';
         document.getElementById('userEmail').textContent    = user.email;
-        unsubC = onSnapshot(collection(db,'users',user.uid,'classes'), s => {
-          classes = s.docs.map(d=>({id:d.id,...d.data()}));
-          populateClassDropdown(); renderClassesTab(); render();
-          // On the very first load, if no classes exist yet, start the user
-          // in the Classes tab so up-front setup comes first.
+        unsubC = onSnapshot(collection(db,'users',user.uid,''), s => {
+           = s.docs.map(d=>({id:d.id,...d.data()}));
+          populateClassDropdown(); renderTab(); render();
+          // On the very first load, if no  exist yet, start the user
+          // in the  tab so up-front setup comes first.
           if(!_initialRouteDone){
             _initialRouteDone = true;
-            if(classes.filter(c=>!c.archived).length === 0){
-              switchTab('classes');
+            if(.filter(c=>!c.archived).length === 0){
+              switchTab('');
             }
           }
         });
@@ -61,7 +61,7 @@
         });
       } else {
         if(unsubT) unsubT(); if(unsubC) unsubC();
-        tasks=[]; classes=[];
+        tasks=[]; =[];
         _initialRouteDone = false;
         document.getElementById('authScreen').style.display = 'flex';
         document.getElementById('appShell').style.display   = 'none';
@@ -508,7 +508,7 @@
             <div class="field" style="margin-bottom:0;"><label>Class name</label><input class="inp" id="className" type="text" placeholder="e.g. BUS 201" onkeydown="if(event.key==='Enter')addClass()"></div>
             <div class="field" style="max-width:160px;margin-bottom:0;"><label>Fatigue limit (min) <span style="color:var(--brick);">*</span></label><input class="inp" id="classFatigue" type="number" min="1" placeholder="e.g. 120" onkeydown="if(event.key==='Enter')addClass()"></div>
             <input type="color" id="classColor" value="#5C8A7D"
-                   style="width:42px;height:42px;border:1px solid var(--line-mid);border-radius:50%;cursor:pointer;background:none;padding:2px;align-self:flex-end;">
+                   style="width:34px;height:34px;border:1px solid var(--line-mid);border-radius:50%;cursor:pointer;background:none;padding:8px;align-self:flex-end;">
             <button class="btn btn-tonal btn-sm" onclick="addClass()" style="align-self:flex-end;">Add class</button>
           </div>
           <div class="cls-add-error" id="classAddError"></div>
