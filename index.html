@@ -53,8 +53,8 @@
         document.getElementById('appShell').style.display   = 'block';
         document.getElementById('userEmail').textContent    = user.email;
         unsubC = onSnapshot(collection(db,'users',user.uid,''), s => {
-           = s.docs.map(d=>({id:d.id,...d.data()}));
-          populateClassDropdown(); renderTab(); render();
+        classes = s.docs.map(d=>({id:d.id,...d.data()}));          
+    populateClassDropdown(); renderTab(); render();
           // On the very first load, if no  exist yet, start the user
           // in the  tab so up-front setup comes first.
           if(!_initialRouteDone){
