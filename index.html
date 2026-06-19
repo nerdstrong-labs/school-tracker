@@ -33,8 +33,17 @@
     const auth = getAuth(app);
     const db   = getFirestore(app);
 
-    window._fbSignIn  = () => signInWithPopup(auth, new GoogleAuthProvider());
-    window._fbSignOut = () => signOut(auth);
+    window._fbSignIn = async () => {
+  try {
+    await signInWithPopup(auth, new GoogleAuthProvider());
+  } catch (err) {
+    console.error('[auth] sign-in failed:', err.code, err.message);
+    if (err.code !== 'auth/popup-closed-by-user' &&
+        err.code !== 'auth/cancelled-popup-request') {
+      alert('Sign-in failed: ' + err.code);
+    }
+  }
+};
 
     let unsubT = null, unsubC = null;
     let _initialRouteDone = false;
