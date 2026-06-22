@@ -400,6 +400,51 @@
     .ms{font-family:'Material Symbols Outlined';font-size:18px;vertical-align:middle;user-select:none;font-style:normal;font-weight:normal;}
     .card-soft{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);box-shadow:var(--shadow-sm);overflow:hidden;}
     .divider{border:none;border-top:1px solid var(--line);margin:1rem 0;}
+
+    /* ── Sliders (estimate & per-day) ────────────────────────── */
+    .slider-field{margin-bottom:1rem;}
+    .slider-field label{display:flex;align-items:center;justify-content:space-between;font-size:.78rem;font-weight:500;color:var(--ink-soft);margin-bottom:.5rem;}
+    .slider-val{font-family:var(--display);font-size:.95rem;font-weight:600;color:var(--sage-deep);}
+    .slider-hint{font-size:.76rem;color:var(--ink-faint);line-height:1.45;margin-top:.45rem;}
+    input[type=range].slider{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:var(--r-f);background:var(--inset);outline:none;cursor:pointer;}
+    input[type=range].slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;background:var(--sage);border:2px solid var(--surface);box-shadow:var(--shadow-sm);cursor:pointer;}
+    input[type=range].slider::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--sage);border:2px solid var(--surface);box-shadow:var(--shadow-sm);cursor:pointer;}
+
+    /* ── Today planner (day rows) ────────────────────────────── */
+    .p-day{margin-bottom:1.1rem;}
+    .p-day-hdr{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:.5rem;padding:0 .15rem;}
+    .p-day-name{font-family:var(--display);font-size:1.02rem;font-weight:600;color:var(--ink);letter-spacing:-.01em;}
+    .p-day-name .p-day-sub{font-family:var(--body);font-size:.74rem;font-weight:500;color:var(--ink-faint);margin-left:.45rem;}
+    .p-day-load{font-size:.74rem;font-weight:600;color:var(--ink-soft);font-variant-numeric:tabular-nums;}
+    .p-day-load.over{color:var(--brick);}
+    .p-day-load.full{color:var(--amber);}
+    .p-cap-track{height:7px;background:var(--inset);border-radius:var(--r-f);overflow:hidden;margin-bottom:.6rem;}
+    .p-cap-fill{height:100%;border-radius:var(--r-f);background:var(--sage);transition:width .4s ease;}
+    .p-cap-fill.full{background:var(--amber);}
+    .p-cap-fill.over{background:var(--brick);}
+
+    .p-block{display:flex;align-items:center;gap:.6rem;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:.7rem .8rem;margin-bottom:.45rem;cursor:pointer;box-shadow:var(--shadow-sm);transition:box-shadow .2s;}
+    .p-block:hover{box-shadow:var(--shadow-md);}
+    .p-block .c-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+    .p-block-title{flex:1;font-size:.9rem;font-weight:500;color:var(--ink);line-height:1.3;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .p-block-due{font-size:.7rem;font-weight:600;padding:.16rem .5rem;border-radius:var(--r-f);white-space:nowrap;flex-shrink:0;}
+    .p-block-due.d-today{background:var(--amber-tint);color:var(--amber);}
+    .p-block-due.d-overdue{background:var(--brick-tint);color:var(--brick);}
+    .p-alloc{font-size:.82rem;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;min-width:46px;text-align:right;}
+    .p-steppers{display:flex;align-items:center;gap:.3rem;flex-shrink:0;}
+    .p-step{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:var(--r-s);border:1px solid var(--line-mid);background:var(--inset-2);color:var(--ink-soft);font-size:16px;line-height:1;cursor:pointer;user-select:none;}
+    .p-step:hover{background:var(--inset);color:var(--ink);}
+    .p-step:active{transform:translateY(1px);}
+
+    .p-detail{background:var(--surface);border:1px solid var(--line);border-top:none;border-radius:0 0 var(--r-m) var(--r-m);margin:-.45rem 0 .55rem;padding:1.1rem;box-shadow:var(--shadow-sm);}
+
+    .p-shortfall{display:flex;gap:.5rem;align-items:flex-start;background:var(--brick-tint);color:var(--brick);border-radius:var(--r-s);padding:.5rem .7rem;margin-bottom:.45rem;font-size:.8rem;line-height:1.4;}
+    .p-shortfall .ms{font-size:16px;margin-top:1px;flex-shrink:0;}
+
+    .p-unsched{margin-top:1.4rem;border-top:1px solid var(--line);padding-top:1rem;}
+    .p-unsched-hdr{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);margin-bottom:.6rem;}
+    .p-unsched .p-block{border-style:dashed;}
+    .p-unsched-hint{font-size:.74rem;color:var(--ink-faint);margin-left:auto;flex-shrink:0;}
   </style>
 </head>
 <body>
@@ -439,7 +484,7 @@
     </button>
     <div class="rail-divider"></div>
     <button class="rail-item active" onclick="switchTab('due')" id="rail-due">
-      <div class="rail-ind"><span class="ms">event</span></div><span>Due Soon</span>
+      <div class="rail-ind"><span class="ms">wb_sunny</span></div><span>Today</span>
     </button>
     <button class="rail-item" onclick="switchTab('byclass')" id="rail-byclass">
       <div class="rail-ind"><span class="ms">folder</span></div><span>By Class</span>
@@ -460,7 +505,7 @@
 
       <!-- Due Soon -->
       <div class="tab-panel active" id="tab-due">
-        <div class="page-eyebrow">Due soon</div>
+        <div class="page-eyebrow">Today</div>
         <div id="taskList"></div>
         <button class="archive-btn" onclick="toggleArchive()">
           <span class="ms">archive</span>Show archived assignments
@@ -546,7 +591,7 @@
   <nav class="nav-bar">
     <div class="nav-bar-inner">
       <button class="nav-item active" onclick="switchTab('due')" id="nav-due">
-        <div class="nav-ind"><span class="ms">event</span></div><span>Due Soon</span>
+        <div class="nav-ind"><span class="ms">wb_sunny</span></div><span>Today</span>
       </button>
       <button class="nav-item" onclick="switchTab('byclass')" id="nav-byclass">
         <div class="nav-ind"><span class="ms">folder</span></div><span>By Class</span>
@@ -590,19 +635,21 @@
             <option>Lab</option><option>Project</option><option>Exam</option><option>Extra Credit</option>
           </select>
         </div>
-        <div class="field" style="margin-bottom:0;"><label>Est. time</label>
-          <select class="inp" id="taskTime" onchange="checkFatigueWarning()">
-            <option value="">—</option><option value="15">15 min</option><option value="30">30 min</option>
-            <option value="60">1 hr</option><option value="90">1.5 hrs</option>
-            <option value="120">2 hrs</option><option value="180">3 hrs</option><option value="240">4 hrs</option>
-          </select>
-        </div>
-        <div class="field" style="min-width:80px;max-width:95px;margin-bottom:0;display:flex;flex-direction:column;justify-content:flex-end;">
+        <div class="field" style="min-width:90px;max-width:110px;margin-bottom:0;display:flex;flex-direction:column;justify-content:flex-end;">
           <label>&nbsp;</label>
           <label style="display:flex;align-items:center;gap:.4rem;font-size:.875rem;color:var(--ink-soft);padding-bottom:.7rem;cursor:pointer;">
             <input type="checkbox" id="taskRecurring" style="accent-color:var(--sage);width:18px;height:18px;"> Weekly
           </label>
         </div>
+      </div>
+      <div class="field slider-field">
+        <label>Estimated time <span class="slider-val" id="taskTimeLabel">not set</span></label>
+        <input type="range" class="slider" id="taskTime" min="0" max="720" step="15" value="0" oninput="onEstimateInput()" onchange="checkFatigueWarning()">
+      </div>
+      <div class="field slider-field">
+        <label>Max per day <span class="slider-val" id="taskPerDayLabel">no limit</span></label>
+        <input type="range" class="slider" id="taskPerDay" min="0" max="720" step="15" value="0" oninput="onPerDayInput()">
+        <p class="slider-hint">Optional. A gentle target so this assignment spreads out instead of cramming. The planner exceeds it only if the due date demands.</p>
       </div>
       <div class="field" style="margin-bottom:0;"><label>Reminder (optional)</label><input class="inp" id="taskReminder" type="datetime-local"></div>
       <div class="fatigue-warn" id="fatigueWarning"></div>
@@ -639,15 +686,14 @@
     <div class="d-head">Edit assignment</div>
     <div class="d-field"><label>Title</label><input class="inp" type="text" id="editTaskTitle"></div>
     <div class="d-field"><label>Notes</label><textarea class="inp" id="editTaskNotes" rows="3" placeholder="Notes for this assignment (optional)"></textarea></div>
-    <div style="display:flex;gap:.75rem;">
-      <div class="d-field" style="flex:1;"><label>Due date</label><input class="inp" type="date" id="editTaskDate"></div>
-      <div class="d-field" style="flex:1;"><label>Est. time</label>
-        <select class="inp" id="editTaskTime">
-          <option value="">—</option><option value="15">15 min</option><option value="30">30 min</option>
-          <option value="60">1 hr</option><option value="90">1.5 hrs</option>
-          <option value="120">2 hrs</option><option value="180">3 hrs</option><option value="240">4 hrs</option>
-        </select>
-      </div>
+    <div class="d-field"><label>Due date</label><input class="inp" type="date" id="editTaskDate"></div>
+    <div class="d-field slider-field">
+      <label>Estimated time <span class="slider-val" id="editTaskTimeLabel">not set</span></label>
+      <input type="range" class="slider" id="editTaskTime" min="0" max="720" step="15" value="0" oninput="onEditEstimateInput()">
+    </div>
+    <div class="d-field slider-field">
+      <label>Max per day <span class="slider-val" id="editTaskPerDayLabel">no limit</span></label>
+      <input type="range" class="slider" id="editTaskPerDay" min="0" max="720" step="15" value="0" oninput="onEditPerDayInput()">
     </div>
     <div class="d-field">
       <label style="display:flex;align-items:center;gap:.5rem;color:var(--ink-soft);font-size:.875rem;cursor:pointer;">
@@ -695,7 +741,7 @@
 </div>
 
 <script>
-  let expandedCardId=null, classIdToManage=null, taskToComplete=null, taskToEdit=null;
+  let expandedCardId=null, expandedBlockId=null, classIdToManage=null, taskToComplete=null, taskToEdit=null;
   let showingArchive=false;
 
   const TICONS={'Quiz':'quiz','Discussion':'forum','Lab':'science','Project':'design_services','Exam':'history_edu','Extra Credit':'stars'};
@@ -719,32 +765,44 @@
   function dateStr(d){ return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().split('T')[0]; }
 
   // Spread an assignment's estimated minutes across the days from today
-  // through its due date, capped per day by the daily capacity. Overdue
-  // work lands on today. Returns a list of day-blocks. This is the seed
-  // distribution; the planner (Stage 2) lets the user adjust it.
+  // through its due date. Honors a soft per-day target when set, relaxing
+  // it only when the deadline can't otherwise be met. The global daily
+  // capacity never blocks placement; it only drives the visual bars.
   function autoDistribute(task){
     const est = task.estimatedTime || 0;
     if(!est || !task.date) return [];
-    const cap = dailyCap();
+    const perDay = task.perDayTargetMinutes || 0;   // soft target; 0 = none
     const today = new Date(); today.setHours(0,0,0,0);
     const due = parseDate(task.date); due.setHours(0,0,0,0);
     const days = [];
     if(due < today){ days.push(todayStr()); }
     else { for(let d=new Date(today); d<=due; d.setDate(d.getDate()+1)) days.push(dateStr(d)); }
+    const n = days.length;
+    // Daily target: the per-day preference if set, otherwise an even spread.
+    let target = perDay>0 ? perDay : Math.ceil(est/n);
+    // If that pace can't finish by the deadline, relax to an even spread.
+    if(target*n < est) target = Math.ceil(est/n);
     const blocks = [];
     let remaining = est;
-    for(let i=0; i<days.length && remaining>0; i++){
-      const take = Math.min(cap, remaining, Math.ceil(remaining/(days.length-i)));
+    for(let i=0; i<n && remaining>0; i++){
+      const take = Math.min(target, remaining);
       if(take<=0) continue;
-      blocks.push({ id:String(Date.now())+'-'+i, date:days[i], allocatedMinutes:take, done:false, actualMinutes:0 });
+      blocks.push({ id:'b'+Date.now()+'-'+i+'-'+Math.floor(Math.random()*1e4), date:days[i], allocatedMinutes:take, done:false, actualMinutes:0 });
       remaining -= take;
     }
     if(remaining>0){
       if(blocks.length) blocks[blocks.length-1].allocatedMinutes += remaining;
-      else blocks.push({ id:String(Date.now()), date:days[0]||todayStr(), allocatedMinutes:remaining, done:false, actualMinutes:0 });
+      else blocks.push({ id:'b'+Date.now(), date:days[0]||todayStr(), allocatedMinutes:remaining, done:false, actualMinutes:0 });
     }
     return blocks;
   }
+
+  // Slider label formatting: minutes -> "2h 30m", with a zero fallback.
+  function sliderLabel(mins, zeroText){ return (!mins||mins<=0) ? zeroText : fmtMin(mins); }
+  function onEstimateInput(){ document.getElementById('taskTimeLabel').textContent = sliderLabel(+document.getElementById('taskTime').value,'not set'); }
+  function onPerDayInput(){ document.getElementById('taskPerDayLabel').textContent = sliderLabel(+document.getElementById('taskPerDay').value,'no limit'); }
+  function onEditEstimateInput(){ document.getElementById('editTaskTimeLabel').textContent = sliderLabel(+document.getElementById('editTaskTime').value,'not set'); }
+  function onEditPerDayInput(){ document.getElementById('editTaskPerDayLabel').textContent = sliderLabel(+document.getElementById('editTaskPerDay').value,'no limit'); }
 
   // One-time, self-terminating: give any existing open assignment a blocks
   // plan if it doesn't have one yet. After the first write the docs carry
@@ -816,11 +874,15 @@
       return;
     }
     const reminderAt=document.getElementById('taskReminder').value||null;
-    const nt={id:String(Date.now()),title,date,notes:document.getElementById('taskNotes').value.trim(),classId:document.getElementById('taskClass').value||null,type:document.getElementById('taskType').value||null,estimatedTime:parseInt(document.getElementById('taskTime').value)||null,timeSpent:0,isTimerRunning:false,lastTimerStart:null,recurring:document.getElementById('taskRecurring').checked,archived:false,subtasks:[],reminderAt,reminderDone:false};
+    const estVal=parseInt(document.getElementById('taskTime').value)||0;
+    const perDayVal=parseInt(document.getElementById('taskPerDay').value)||0;
+    const nt={id:String(Date.now()),title,date,notes:document.getElementById('taskNotes').value.trim(),classId:document.getElementById('taskClass').value||null,type:document.getElementById('taskType').value||null,estimatedTime:estVal||null,perDayTargetMinutes:perDayVal||null,timeSpent:0,isTimerRunning:false,lastTimerStart:null,recurring:document.getElementById('taskRecurring').checked,archived:false,subtasks:[],reminderAt,reminderDone:false};
     nt.blocks=autoDistribute(nt);
     maybeRequestNotifPermission(reminderAt);
     tasks.push(nt);render();
-    ['taskTitle','taskDate','taskType','taskTime','taskClass','taskReminder','taskNotes'].forEach(id=>document.getElementById(id).value='');
+    ['taskTitle','taskDate','taskType','taskClass','taskReminder','taskNotes'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('taskTime').value=0;document.getElementById('taskPerDay').value=0;
+    document.getElementById('taskTimeLabel').textContent='not set';document.getElementById('taskPerDayLabel').textContent='no limit';
     document.getElementById('taskRecurring').checked=false;
     document.getElementById('fatigueWarning').style.display='none';
     document.getElementById('formOptional').classList.remove('open');
@@ -1030,8 +1092,13 @@
     div.appendChild(top);
 
     const body=document.createElement('div');body.className='card-body';
+    body.innerHTML=cardBodyHTML(task,isArchive);
+    div.appendChild(body);return div;
+  }
 
-    // Timer button — sits where the chips used to live, above the time row
+  // The expandable detail content (notes, timer, time, subtasks, actions).
+  // Shared by the card list (By Class, Archive) and the Today planner.
+  function cardBodyHTML(task,isArchive=false){
     const timerCls=task.isTimerRunning?'btn-err':'btn-outlined';
     const timerIco=task.isTimerRunning?'pause':'play_arrow';
     const timerTxt=task.isTimerRunning?'Stop':'Timer';
@@ -1040,17 +1107,15 @@
     const sp=task.timeSpent||0;
     const timeRow=`<div class="time-row"><div class="time-card"><div class="t-label">Estimated</div><div class="t-val">${task.estimatedTime?fmtMin(task.estimatedTime):'—'}</div></div><div class="time-card"><div class="t-label">Actual</div><div class="t-val ${task.isTimerRunning?'running':''}" id="timer-display-${task.id}">${sp>0||task.isTimerRunning?fmtSec(sp):'—'}</div></div></div>`;
 
-    const subHTML=task.subtasks.map(st=>`<div class="sub-item"><input type="checkbox" ${st.done?'checked':''} onchange="toggleSubtask('${task.id}','${st.id}')" ${isArchive?'disabled':''}><span class="sub-text ${st.done?'sub-done':''}">${st.text}</span></div>`).join('');
+    const subs=task.subtasks||[];
+    const subHTML=subs.map(st=>`<div class="sub-item"><input type="checkbox" ${st.done?'checked':''} onchange="toggleSubtask('${task.id}','${st.id}')" ${isArchive?'disabled':''}><span class="sub-text ${st.done?'sub-done':''}">${st.text}</span></div>`).join('');
     const subInput=isArchive?'':`<div class="sub-add"><input class="inp" id="subtask-input-${task.id}" placeholder="Add a step…" style="font-size:.875rem;" onkeydown="if(event.key==='Enter')addSubtask('${task.id}')"><button class="btn btn-tonal btn-sm" onclick="addSubtask('${task.id}')">Add</button></div>`;
-    const subBlock=(task.subtasks.length||!isArchive)?`<div class="sub-list">${subHTML}${subInput}</div>`:'';
+    const subBlock=(subs.length||!isArchive)?`<div class="sub-list">${subHTML}${subInput}</div>`:'';
 
-    // Edit + Done, right-aligned (timer no longer lives here)
     const actions=isArchive?'':`<hr class="divider"><div class="card-actions card-actions-right"><button class="btn btn-outlined btn-sm" onclick="openEditModal('${task.id}')"><span class="ms">edit</span>Edit</button><button class="btn btn-good btn-sm" onclick="openCompletionModal('${task.id}')"><span class="ms">check</span>Done</button></div>`;
 
     const notesBlock=task.notes?`<div class="card-notes">${esc(task.notes)}</div>`:'';
-
-    body.innerHTML=`${notesBlock}${timerRow}${timeRow}${subBlock}${actions}`;
-    div.appendChild(body);return div;
+    return `${notesBlock}${timerRow}${timeRow}${subBlock}${actions}`;
   }
 
   function toggleCard(taskId,el){
@@ -1058,12 +1123,153 @@
     expandedCardId=el.classList.toggle('expanded')?taskId:null;
   }
 
+  // ── Today planner ────────────────────────────────────────────
+  const PLANNER_DAYS = 7;  // visible window: today + next 6 days
+
+  function plannerDayLabel(dStr){
+    const d = diffDays(dStr);
+    if(d===0) return 'Today';
+    if(d===1) return 'Tomorrow';
+    return parseDate(dStr).toLocaleDateString('en-US',{weekday:'long'});
+  }
+
+  // A true, assignment-level shortfall: even packed alone at full daily
+  // capacity from today to the due date, the work can't fit.
+  function assignmentShortfall(task){
+    const est=task.estimatedTime||0;
+    if(!est||!task.date) return null;
+    if(diffDays(task.date) < 0) return {kind:'overdue'};
+    const n = diffDays(task.date)+1;            // inclusive days today..due
+    if(est > n*dailyCap()) return {kind:'tight', need:est, have:n*dailyCap()};
+    return null;
+  }
+
   function renderTasks(){
     const l=document.getElementById('taskList');l.innerHTML='';
-    const active=tasks.filter(t=>!t.archived).sort((a,b)=>new Date(a.date)-new Date(b.date));
-    if(!active.length){l.innerHTML='<p class="empty">Nothing due right now. Tap <strong>Add</strong> to create your first assignment.</p>';return;}
-    active.forEach(t=>l.appendChild(buildCard(t)));
-    if(expandedCardId){const el=document.querySelector(`[data-id="${expandedCardId}"]`);if(el)el.classList.add('expanded');}
+    const active=tasks.filter(t=>!t.archived);
+    if(!active.length){l.innerHTML='<p class="empty">Nothing planned yet. Tap <strong>Add</strong> to create your first assignment.</p>';return;}
+
+    // Build the visible day window and gather each day's blocks.
+    const today=new Date();today.setHours(0,0,0,0);
+    const cap=dailyCap();
+    const taskById={};active.forEach(t=>taskById[t.id]=t);
+
+    for(let i=0;i<PLANNER_DAYS;i++){
+      const d=new Date(today);d.setDate(d.getDate()+i);const ds=dateStr(d);
+      // Collect (task, block) pairs scheduled on this day.
+      const entries=[];
+      active.forEach(t=>(t.blocks||[]).forEach(b=>{ if(b.date===ds && b.allocatedMinutes>0) entries.push({t,b}); }));
+      // Overdue blocks (dates before today) fold into Today so nothing hides.
+      if(i===0){
+        active.forEach(t=>(t.blocks||[]).forEach(b=>{ if(b.allocatedMinutes>0 && diffDays(b.date)<0) entries.push({t,b,overdue:true}); }));
+      }
+      if(!entries.length && i>0) continue;   // skip empty future days; always show Today
+
+      const load=entries.reduce((s,e)=>s+e.b.allocatedMinutes,0);
+      const pct=cap>0?Math.min(100,Math.round(load/cap*100)):0;
+      const state=load>cap?'over':(load===cap&&load>0?'full':'');
+      const loadTxt=`${fmtMin(load)} / ${fmtMin(cap)}${state==='over'?' · over':state==='full'?' · full':''}`;
+
+      const day=document.createElement('div');day.className='p-day';
+      day.innerHTML=`
+        <div class="p-day-hdr">
+          <span class="p-day-name">${plannerDayLabel(ds)}<span class="p-day-sub">${absDate(ds)}</span></span>
+          <span class="p-day-load ${state}">${load>0?loadTxt:'—'}</span>
+        </div>
+        <div class="p-cap-track"><span class="p-cap-fill ${state}" style="width:${load>0?Math.max(3,pct):0}%;"></span></div>`;
+
+      entries.forEach(({t,b,overdue})=>{
+        const cls=t.classId?classes.find(c=>c.id===t.classId):null;
+        const dot=cls?cls.color:'var(--line-mid)';
+        const sf=assignmentShortfall(t);
+        if(sf){
+          const msg=sf.kind==='overdue'
+            ? `<strong>${esc(t.title)}</strong> is past its due date with work still planned.`
+            : `<strong>${esc(t.title)}</strong> needs ${fmtMin(sf.need)} before it's due, but only ${fmtMin(sf.have)} of capacity fits in time.`;
+          const warn=document.createElement('div');warn.className='p-shortfall';
+          warn.innerHTML=`<span class="ms">warning</span><span>${msg}</span>`;
+          // Only show the warning once per day (above its first block).
+          if(!day.querySelector(`.p-shortfall[data-for="${t.id}"]`)){ warn.setAttribute('data-for',t.id); day.appendChild(warn); }
+        }
+        const dueChip = diffDays(t.date)<0 ? `<span class="p-block-due d-overdue">${Math.abs(diffDays(t.date))}d over</span>`
+                       : diffDays(t.date)===0 ? `<span class="p-block-due d-today">due today</span>` : '';
+        const row=document.createElement('div');row.className='p-block';row.dataset.id=t.id;row.dataset.block=b.id;
+        row.innerHTML=`
+          <span class="c-dot" style="background:${dot};"></span>
+          <span class="p-block-title">${esc(t.title)}</span>
+          ${dueChip}
+          <span class="p-alloc">${fmtMin(b.allocatedMinutes)}</span>
+          <span class="p-steppers">
+            <span class="p-step ms" onclick="event.stopPropagation();stepBlock('${t.id}','${b.id}',-15)">remove</span>
+            <span class="p-step ms" onclick="event.stopPropagation();stepBlock('${t.id}','${b.id}',15)">add</span>
+          </span>`;
+        row.onclick=()=>togglePlannerCard(t.id,b.id);
+        day.appendChild(row);
+        // Inline detail under the block the user opened.
+        if(expandedCardId===t.id && expandedBlockId===b.id){
+          const det=document.createElement('div');det.className='p-detail';
+          det.innerHTML=cardBodyHTML(t);
+          day.appendChild(det);
+        }
+      });
+      l.appendChild(day);
+    }
+
+    // Unscheduled: assignments with no estimate can't be placed yet.
+    const unsched=active.filter(t=>!t.estimatedTime);
+    if(unsched.length){
+      const sec=document.createElement('div');sec.className='p-unsched';
+      sec.innerHTML=`<div class="p-unsched-hdr">Unscheduled</div>`;
+      unsched.forEach(t=>{
+        const cls=t.classId?classes.find(c=>c.id===t.classId):null;
+        const dot=cls?cls.color:'var(--line-mid)';
+        const row=document.createElement('div');row.className='p-block';row.dataset.id=t.id;
+        row.innerHTML=`
+          <span class="c-dot" style="background:${dot};"></span>
+          <span class="p-block-title">${esc(t.title)}</span>
+          <span class="p-unsched-hint">add an estimate to schedule</span>`;
+        row.onclick=()=>openEditModal(t.id);
+        sec.appendChild(row);
+        if(expandedCardId===t.id && expandedBlockId==='unsched'){
+          const det=document.createElement('div');det.className='p-detail';det.innerHTML=cardBodyHTML(t);sec.appendChild(det);
+        }
+      });
+      l.appendChild(sec);
+    }
+  }
+
+  function togglePlannerCard(taskId,blockId){
+    if(expandedCardId===taskId && expandedBlockId===blockId){ expandedCardId=null; expandedBlockId=null; }
+    else { expandedCardId=taskId; expandedBlockId=blockId; }
+    renderTasks();
+  }
+
+  // Step a day's allocation up or down by `delta` minutes, conserving the
+  // assignment's total by auto-shifting the difference to an adjacent day.
+  async function stepBlock(taskId,blockId,delta){
+    const task=tasks.find(t=>t.id===taskId);if(!task||!task.blocks)return;
+    const blocks=[...task.blocks].sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
+    const i=blocks.findIndex(b=>b.id===blockId);if(i<0)return;
+    if(delta<0){
+      // Move time OUT of day i to the next day (or previous if i is last).
+      const move=Math.min(-delta, blocks[i].allocatedMinutes);
+      if(move<=0)return;
+      const r = (i+1<blocks.length)?i+1:(i-1>=0?i-1:-1);
+      if(r<0)return;                       // single day — nowhere to shift
+      blocks[i].allocatedMinutes-=move;
+      blocks[r].allocatedMinutes+=move;
+    } else {
+      // Move time INTO day i from the next day (or previous if i is last).
+      const d = (i+1<blocks.length)?i+1:(i-1>=0?i-1:-1);
+      if(d<0)return;
+      const move=Math.min(delta, blocks[d].allocatedMinutes);
+      if(move<=0)return;
+      blocks[i].allocatedMinutes+=move;
+      blocks[d].allocatedMinutes-=move;
+    }
+    task.blocks=blocks.filter(b=>b.allocatedMinutes>0);  // drop emptied days
+    render();
+    await saveTask(task);
   }
 
   function toggleArchive(){showingArchive=!showingArchive;document.getElementById('archiveList').style.display=showingArchive?'block':'none';}
@@ -1305,7 +1511,7 @@
     taskToComplete.subtasks.forEach(st=>{const cb=document.getElementById(`comp-sub-${st.id}`);if(cb)st.done=cb.checked;});
     if(taskToComplete.recurring){
       const d=parseDate(taskToComplete.date);d.setDate(d.getDate()+7);
-      const nt={id:String(Date.now()),title:taskToComplete.title,date:d.toISOString().split('T')[0],notes:taskToComplete.notes||'',classId:taskToComplete.classId,recurring:true,archived:false,type:taskToComplete.type,estimatedTime:taskToComplete.estimatedTime,timeSpent:0,isTimerRunning:false,lastTimerStart:null,subtasks:taskToComplete.subtasks.map(st=>({id:String(Date.now()+Math.random()),text:st.text,done:false}))};
+      const nt={id:String(Date.now()),title:taskToComplete.title,date:d.toISOString().split('T')[0],notes:taskToComplete.notes||'',classId:taskToComplete.classId,recurring:true,archived:false,type:taskToComplete.type,estimatedTime:taskToComplete.estimatedTime,perDayTargetMinutes:taskToComplete.perDayTargetMinutes||null,timeSpent:0,isTimerRunning:false,lastTimerStart:null,subtasks:taskToComplete.subtasks.map(st=>({id:String(Date.now()+Math.random()),text:st.text,done:false}))};
       nt.blocks=autoDistribute(nt);
       tasks.push(nt);await saveTask(nt);
     }
@@ -1317,7 +1523,10 @@
     document.getElementById('editTaskTitle').value=taskToEdit.title||'';
     document.getElementById('editTaskNotes').value=taskToEdit.notes||'';
     document.getElementById('editTaskDate').value=taskToEdit.date||'';
-    document.getElementById('editTaskTime').value=taskToEdit.estimatedTime||'';
+    document.getElementById('editTaskTime').value=taskToEdit.estimatedTime||0;
+    document.getElementById('editTaskPerDay').value=taskToEdit.perDayTargetMinutes||0;
+    document.getElementById('editTaskTimeLabel').textContent=sliderLabel(taskToEdit.estimatedTime||0,'not set');
+    document.getElementById('editTaskPerDayLabel').textContent=sliderLabel(taskToEdit.perDayTargetMinutes||0,'no limit');
     document.getElementById('editTaskRecurring').checked=!!taskToEdit.recurring;
     document.getElementById('editTaskReminder').value=taskToEdit.reminderAt||'';
     openModal('editModal');
@@ -1326,14 +1535,15 @@
     if(!taskToEdit)return;
     const title=document.getElementById('editTaskTitle').value.trim(),date=document.getElementById('editTaskDate').value;
     if(!title||!date)return;
-    const prevDate=taskToEdit.date, prevEst=taskToEdit.estimatedTime;
+    const prevDate=taskToEdit.date, prevEst=taskToEdit.estimatedTime, prevPerDay=taskToEdit.perDayTargetMinutes;
     taskToEdit.title=title;taskToEdit.date=date;
     taskToEdit.notes=document.getElementById('editTaskNotes').value.trim();
     taskToEdit.estimatedTime=parseInt(document.getElementById('editTaskTime').value)||null;
+    taskToEdit.perDayTargetMinutes=parseInt(document.getElementById('editTaskPerDay').value)||null;
     taskToEdit.recurring=document.getElementById('editTaskRecurring').checked;
-    // If the due date or estimate changed, re-seed the schedule — but never
-    // wipe a plan once any of its blocks has been started.
-    const scheduleChanged = (taskToEdit.date!==prevDate) || (taskToEdit.estimatedTime!==prevEst);
+    // If the due date, estimate, or per-day target changed, re-seed the
+    // schedule — but never wipe a plan once any of its blocks is started.
+    const scheduleChanged = (taskToEdit.date!==prevDate) || (taskToEdit.estimatedTime!==prevEst) || (taskToEdit.perDayTargetMinutes!==prevPerDay);
     const anyStarted = (taskToEdit.blocks||[]).some(b=>b.done || b.actualMinutes>0);
     if(scheduleChanged && !anyStarted){ taskToEdit.blocks=autoDistribute(taskToEdit); }
     const newReminder=document.getElementById('editTaskReminder').value||null;
@@ -1350,16 +1560,6 @@
   function openModal(id){document.getElementById(id).classList.add('open');}
   function closeModal(id){document.getElementById(id).classList.remove('open');taskToComplete=null;taskToEdit=null;}
   document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
-
-  new Sortable(document.getElementById('taskList'),{
-    animation:150,ghostClass:'sortable-ghost',
-    async onEnd(){
-      const ids=Array.from(document.getElementById('taskList').children).map(c=>c.dataset.id).filter(Boolean);
-      const active=tasks.filter(t=>!t.archived),archived=tasks.filter(t=>t.archived);
-      tasks=[...ids.map(id=>active.find(t=>t.id===id)).filter(Boolean),...archived];
-      await window._saveAllTasks(tasks);flashSync();
-    }
-  });
 
   function exportData(){const b=new Blob([JSON.stringify({tasks,classes},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`school_tracker_${todayStr()}.json`;a.click();URL.revokeObjectURL(a.href);}
   async function importData(e){
