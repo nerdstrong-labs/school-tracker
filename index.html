@@ -13,6 +13,7 @@
     // main app script read and write these.
     var tasks = [];
     var classes = [];
+    var settings = {};   // user preferences, e.g. dailyCapacityMinutes
   </script>
 
   <script type="module">
@@ -46,7 +47,7 @@
     };
     window._fbSignOut = () => signOut(auth);
 
-    let unsubT = null, unsubC = null;
+    let unsubT = null, unsubC = null, unsubS = null;
     let _initialRouteDone = false;
     onAuthStateChanged(auth, user => {
       if (user) {
@@ -68,10 +69,14 @@
         unsubT = onSnapshot(collection(db,'users',user.uid,'tasks'), s => {
           tasks = s.docs.map(d=>({id:d.id,...d.data()}));
           render();
+          maybeBackfillBlocks();
+        });
+        unsubS = onSnapshot(doc(db,'users',user.uid,'meta','prefs'), d => {
+          settings = d.exists() ? d.data() : {};
         });
       } else {
-        if(unsubT) unsubT(); if(unsubC) unsubC();
-        tasks=[]; classes=[];
+        if(unsubT) unsubT(); if(unsubC) unsubC(); if(unsubS) unsubS();
+        tasks=[]; classes=[]; settings={};
         _initialRouteDone = false;
         document.getElementById('authScreen').style.display = 'flex';
         document.getElementById('appShell').style.display   = 'none';
@@ -82,6 +87,7 @@
     window._saveTask    = async t  => { const{id,...d}=t; await setDoc(doc(db,'users',uid(),'tasks',String(id)),d); };
     window._saveClass   = async c  => { const{id,...d}=c; await setDoc(doc(db,'users',uid(),'classes',String(id)),d); };
     window._deleteClass = async id => { await deleteDoc(doc(db,'users',uid(),'classes',String(id))); };
+    window._saveSettings = async s => { await setDoc(doc(db,'users',uid(),'meta','prefs'), s); };
     window._saveAllTasks = async list => {
       const b=writeBatch(db);
       list.forEach(t=>{ const{id,...d}=t; b.set(doc(db,'users',uid(),'tasks',String(id)),d); });
@@ -420,6 +426,7 @@
     <div class="top-bar-actions">
       <span class="sync" id="syncIndicator">✓ saved</span>
       <span id="userEmail"></span>
+      <button class="btn btn-text btn-sm" onclick="openSettings()" aria-label="Settings" title="Settings"><span class="ms" style="font-size:20px;">settings</span></button>
       <button class="btn btn-text btn-sm" onclick="window._fbSignOut()">Sign out</button>
     </div>
   </header>
@@ -670,6 +677,23 @@
   </div>
 </div>
 
+<!-- ── Settings Modal ─────────────────────────────────────────── -->
+<div class="overlay" id="settingsModal">
+  <div class="dialog">
+    <span class="ms d-icon">settings</span>
+    <div class="d-head">Settings</div>
+    <div class="d-field">
+      <label>Daily focus capacity (hours)</label>
+      <input class="inp" type="number" id="settingCapacity" min="0.5" step="0.5" placeholder="e.g. 4">
+      <p style="font-size:.8rem;color:var(--ink-faint);line-height:1.5;margin-top:.4rem;">The amount of focused work you can comfortably handle in a day. Your planner uses this to warn you before a day gets overloaded.</p>
+    </div>
+    <div class="d-actions">
+      <button class="btn btn-text" onclick="closeModal('settingsModal')">Cancel</button>
+      <button class="btn btn-filled" onclick="saveSettings()">Save</button>
+    </div>
+  </div>
+</div>
+
 <script>
   let expandedCardId=null, classIdToManage=null, taskToComplete=null, taskToEdit=null;
   let showingArchive=false;
@@ -688,6 +712,70 @@
   function friendlyDate(s){if(!s)return'—';const d=diffDays(s);if(d<0)return`${Math.abs(d)}d overdue`;if(d===0)return'Today';if(d===1)return'Tomorrow';if(d<=6)return parseDate(s).toLocaleDateString('en-US',{weekday:'short'});return parseDate(s).toLocaleDateString('en-US',{month:'short',day:'numeric'});}
   function fmtSec(s){const m=Math.floor(s/60);if(m<60)return m+'m';const h=Math.floor(m/60),r=m%60;return r?`${h}h ${r}m`:`${h}h`;}
   function fmtMin(m){if(!m)return'—';if(m<60)return m+'m';const h=Math.floor(m/60),r=m%60;return r?`${h}h ${r}m`:`${h}h`;}
+
+  // ── Daily capacity & scheduling foundation (Stage 1) ─────────
+  const DAILY_CAP_DEFAULT = 240;  // minutes — used until the user sets their own
+  function dailyCap(){ return (settings && settings.dailyCapacityMinutes) || DAILY_CAP_DEFAULT; }
+  function dateStr(d){ return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().split('T')[0]; }
+
+  // Spread an assignment's estimated minutes across the days from today
+  // through its due date, capped per day by the daily capacity. Overdue
+  // work lands on today. Returns a list of day-blocks. This is the seed
+  // distribution; the planner (Stage 2) lets the user adjust it.
+  function autoDistribute(task){
+    const est = task.estimatedTime || 0;
+    if(!est || !task.date) return [];
+    const cap = dailyCap();
+    const today = new Date(); today.setHours(0,0,0,0);
+    const due = parseDate(task.date); due.setHours(0,0,0,0);
+    const days = [];
+    if(due < today){ days.push(todayStr()); }
+    else { for(let d=new Date(today); d<=due; d.setDate(d.getDate()+1)) days.push(dateStr(d)); }
+    const blocks = [];
+    let remaining = est;
+    for(let i=0; i<days.length && remaining>0; i++){
+      const take = Math.min(cap, remaining, Math.ceil(remaining/(days.length-i)));
+      if(take<=0) continue;
+      blocks.push({ id:String(Date.now())+'-'+i, date:days[i], allocatedMinutes:take, done:false, actualMinutes:0 });
+      remaining -= take;
+    }
+    if(remaining>0){
+      if(blocks.length) blocks[blocks.length-1].allocatedMinutes += remaining;
+      else blocks.push({ id:String(Date.now()), date:days[0]||todayStr(), allocatedMinutes:remaining, done:false, actualMinutes:0 });
+    }
+    return blocks;
+  }
+
+  // One-time, self-terminating: give any existing open assignment a blocks
+  // plan if it doesn't have one yet. After the first write the docs carry
+  // blocks, so subsequent loads find nothing to do.
+  let _backfilling = false;
+  async function maybeBackfillBlocks(){
+    if(_backfilling) return;
+    const todo = tasks.filter(t=>!t.archived && t.blocks===undefined);
+    if(!todo.length) return;
+    _backfilling = true;
+    try {
+      todo.forEach(t=>{ t.blocks = autoDistribute(t); });
+      await window._saveAllTasks(tasks);
+      flashSync();
+    } finally { _backfilling = false; }
+  }
+
+  // ── Settings ─────────────────────────────────────────────────
+  function openSettings(){
+    const mins = (settings && settings.dailyCapacityMinutes) || DAILY_CAP_DEFAULT;
+    document.getElementById('settingCapacity').value = (mins/60);
+    openModal('settingsModal');
+  }
+  async function saveSettings(){
+    const hrs = parseFloat(document.getElementById('settingCapacity').value);
+    if(!hrs || hrs<=0) return;
+    settings = { ...settings, dailyCapacityMinutes: Math.round(hrs*60) };
+    await window._saveSettings(settings);
+    flashSync();
+    closeModal('settingsModal');
+  }
 
   const TAB_IDS=['due','byclass','history','classes'];
   function switchTab(name){
@@ -729,6 +817,7 @@
     }
     const reminderAt=document.getElementById('taskReminder').value||null;
     const nt={id:String(Date.now()),title,date,notes:document.getElementById('taskNotes').value.trim(),classId:document.getElementById('taskClass').value||null,type:document.getElementById('taskType').value||null,estimatedTime:parseInt(document.getElementById('taskTime').value)||null,timeSpent:0,isTimerRunning:false,lastTimerStart:null,recurring:document.getElementById('taskRecurring').checked,archived:false,subtasks:[],reminderAt,reminderDone:false};
+    nt.blocks=autoDistribute(nt);
     maybeRequestNotifPermission(reminderAt);
     tasks.push(nt);render();
     ['taskTitle','taskDate','taskType','taskTime','taskClass','taskReminder','taskNotes'].forEach(id=>document.getElementById(id).value='');
@@ -1217,6 +1306,7 @@
     if(taskToComplete.recurring){
       const d=parseDate(taskToComplete.date);d.setDate(d.getDate()+7);
       const nt={id:String(Date.now()),title:taskToComplete.title,date:d.toISOString().split('T')[0],notes:taskToComplete.notes||'',classId:taskToComplete.classId,recurring:true,archived:false,type:taskToComplete.type,estimatedTime:taskToComplete.estimatedTime,timeSpent:0,isTimerRunning:false,lastTimerStart:null,subtasks:taskToComplete.subtasks.map(st=>({id:String(Date.now()+Math.random()),text:st.text,done:false}))};
+      nt.blocks=autoDistribute(nt);
       tasks.push(nt);await saveTask(nt);
     }
     taskToComplete.archived=true;await saveTask(taskToComplete);closeModal('completionModal');
@@ -1236,10 +1326,16 @@
     if(!taskToEdit)return;
     const title=document.getElementById('editTaskTitle').value.trim(),date=document.getElementById('editTaskDate').value;
     if(!title||!date)return;
+    const prevDate=taskToEdit.date, prevEst=taskToEdit.estimatedTime;
     taskToEdit.title=title;taskToEdit.date=date;
     taskToEdit.notes=document.getElementById('editTaskNotes').value.trim();
     taskToEdit.estimatedTime=parseInt(document.getElementById('editTaskTime').value)||null;
     taskToEdit.recurring=document.getElementById('editTaskRecurring').checked;
+    // If the due date or estimate changed, re-seed the schedule — but never
+    // wipe a plan once any of its blocks has been started.
+    const scheduleChanged = (taskToEdit.date!==prevDate) || (taskToEdit.estimatedTime!==prevEst);
+    const anyStarted = (taskToEdit.blocks||[]).some(b=>b.done || b.actualMinutes>0);
+    if(scheduleChanged && !anyStarted){ taskToEdit.blocks=autoDistribute(taskToEdit); }
     const newReminder=document.getElementById('editTaskReminder').value||null;
     if(newReminder!==taskToEdit.reminderAt){
       // Reminder time changed — re-arm it so it can fire again
